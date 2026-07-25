@@ -2,13 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
-  startSoundscape,
   stopSoundscape,
-  getPlayingState,
   playWorkCompleteSound,
   playBreakEndSound,
-  type SoundscapeType,
 } from '../utils/audio';
+import MusicPicker from '../components/MusicPicker';
 
 export default function PomodoroTimerPage() {
   const { state, addCheckin, stopPomodoro, startBreak, incrementCycle } = useApp();
@@ -17,7 +15,6 @@ export default function PomodoroTimerPage() {
 
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
-  const [musicType, setMusicType] = useState<SoundscapeType>('rain');
   const intervalRef = useRef<number | null>(null);
   const hasAlerted = useRef(false);
 
@@ -28,12 +25,8 @@ export default function PomodoroTimerPage() {
     }
   }, [activePomodoro, navigate]);
 
-  // Start music on mount
+  // Cleanup on unmount
   useEffect(() => {
-    if (!getPlayingState()) {
-      startSoundscape('rain');
-      setMusicType('rain');
-    }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
@@ -84,25 +77,16 @@ export default function PomodoroTimerPage() {
   };
 
   const handleFinish = () => {
+    navigate('/checkin', { replace: true });
     addCheckin(activePomodoro!.habitId);
     stopPomodoro();
     stopSoundscape();
-    navigate('/checkin', { replace: true });
   };
 
   const handleCancel = () => {
+    navigate('/checkin', { replace: true });
     stopPomodoro();
     stopSoundscape();
-    navigate('/checkin', { replace: true });
-  };
-
-  const handleMusicChange = (type: SoundscapeType) => {
-    setMusicType(type);
-    if (type === 'none') {
-      stopSoundscape();
-    } else if (type !== 'file') {
-      startSoundscape(type);
-    }
   };
 
   if (!activePomodoro) return null;
@@ -120,9 +104,17 @@ export default function PomodoroTimerPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-8 relative"
+      style={{ background: 'linear-gradient(180deg, #d4e8d0 0%, #c8e6c0 8%, #e8f5e3 25%, #f5faf2 50%, #fafcfa 100%)' }}
+    >
+      {/* 树影光斑 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-4 left-4 w-16 h-16 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #a5d6a7, transparent 70%)' }} />
+        <div className="absolute top-12 right-8 w-20 h-20 rounded-full opacity-15" style={{ background: 'radial-gradient(circle, #81c784, transparent 70%)' }} />
+        <div className="absolute top-1/3 left-1/2 w-24 h-24 rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #c8e6c9, transparent 70%)' }} />
+      </div>
       {/* Header */}
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 relative z-10">
         <span className="text-4xl">{activePomodoro.habitEmoji}</span>
         <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200 mt-2">{activePomodoro.habitName}</h1>
         <p className="text-gray-400 text-sm mt-1">
@@ -180,27 +172,8 @@ export default function PomodoroTimerPage() {
       )}
 
       {/* Music picker */}
-      <div className="mt-8 flex gap-2">
-        {([
-          { type: 'rain' as SoundscapeType, label: '🌧 雨声' },
-          { type: 'ocean' as SoundscapeType, label: '🌊 海浪' },
-          { type: 'lofi' as SoundscapeType, label: '🌿 舒缓' },
-          { type: 'canon' as SoundscapeType, label: '🎻 卡农' },
-          { type: 'mariage' as SoundscapeType, label: '💒 梦婚' },
-          { type: 'none' as SoundscapeType, label: '🔇' },
-        ]).map(({ type, label }) => (
-          <button
-            key={type}
-            onClick={() => handleMusicChange(type)}
-            className={`px-3 py-2 rounded-xl text-xs transition-all ${
-              musicType === type
-                ? 'bg-indigo-100 dark:bg-indigo-900/30 ring-1 ring-indigo-300 text-indigo-600'
-                : 'bg-white dark:bg-gray-800 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="mt-8 w-full max-w-sm">
+        <MusicPicker />
       </div>
     </div>
   );

@@ -48,9 +48,17 @@ export default function WelcomePage() {
   const [showDownload, setShowDownload] = useState(false);
 
   return (
-    <div className="min-h-dvh bg-gradient-to-b from-indigo-50 via-white to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+    <div className="min-h-dvh relative"
+      style={{
+        background: 'linear-gradient(180deg, #f8f7ff 0%, #fdfcfd 20%, #f5f3ff 60%, #faf9fe 100%)',
+      }}
+    >
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-20 w-80 h-80 rounded-full opacity-[0.08]" style={{ background: 'radial-gradient(circle, #818cf8, transparent 70%)' }} />
+        <div className="absolute top-1/3 -left-32 w-96 h-96 rounded-full opacity-[0.05]" style={{ background: 'radial-gradient(circle, #a78bfa, transparent 70%)' }} />
+      </div>
       {/* Hero */}
-      <div className="px-5 pt-10 pb-6 text-center">
+      <div className="relative z-10 px-5 pt-10 pb-6 text-center">
         {user && (
           <p className="text-xs text-indigo-400 mb-2">👋 {user.email || user.phone || '已登录'}</p>
         )}
@@ -98,9 +106,9 @@ export default function WelcomePage() {
       <div className="px-5 pb-6">
         <div className="flex justify-center gap-6 text-center">
           {[
-            { n: '10,000+', l: '用户' },
-            { n: '100%', l: '免费' },
-            { n: '🔒', l: '无需网络' },
+            { n: '🔥', l: '坚持打卡' },
+            { n: '🏆', l: '排行榜' },
+            { n: '📊', l: '数据统计' },
           ].map((s) => (
             <div key={s.l}>
               <div className="text-lg font-bold text-indigo-500">{s.n}</div>
@@ -119,7 +127,7 @@ export default function WelcomePage() {
           {FEATURES.map((f) => (
             <div
               key={f.title}
-              className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3.5 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-3 active:scale-[0.98] transition-transform"
+              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl px-4 py-3.5 shadow-sm border border-gray-100/60 dark:border-gray-700/40 flex items-center gap-3 active:scale-[0.98] transition-transform"
             >
               <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center text-lg shrink-0 shadow-sm`}>
                 {f.icon}
@@ -130,6 +138,36 @@ export default function WelcomePage() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Pro upsell */}
+      <div className="px-4 pb-6">
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-800 rounded-3xl px-6 py-6 text-center max-w-sm mx-auto">
+          <span className="text-3xl block mb-2">⭐</span>
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">升级 Pro，解锁全部功能</h2>
+          <div className="text-left space-y-2 mb-5 text-sm">
+            {[
+              { free: '3个习惯', pro: '无限习惯', icon: '📋' },
+              { free: '7天统计', pro: '全部历史统计', icon: '📊' },
+              { free: '雨声', pro: '全部专注音乐', icon: '🎵' },
+              { free: '本地存储', pro: '云端同步', icon: '☁️' },
+              { free: '基础排行', pro: '排名徽章', icon: '🏅' },
+            ].map((row) => (
+              <div key={row.icon} className="flex items-center gap-2">
+                <span className="text-base">{row.icon}</span>
+                <span className="text-gray-400 dark:text-gray-500 line-through text-xs flex-1">{row.free}</span>
+                <span className="text-amber-600 dark:text-amber-400 font-medium text-xs">{row.pro}</span>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => alert('Pro 订阅即将上线！')}
+            className="w-full py-3 rounded-2xl bg-amber-500 text-white font-bold text-sm hover:bg-amber-600 transition-all active:scale-95 shadow-lg shadow-amber-500/25"
+          >
+            ⭐ 解锁 Pro · 即将上线
+          </button>
+          <p className="text-[11px] text-gray-400 mt-2">年付 ¥12（月均¥1）· 终身 ¥48（永久使用）</p>
         </div>
       </div>
 
@@ -144,7 +182,7 @@ export default function WelcomePage() {
             { step: '2', title: '每日打卡', desc: '一键打卡或番茄钟专注' },
             { step: '3', title: '追踪成长', desc: '数据统计看见进步' },
           ].map((item, i) => (
-            <div key={i} className="flex-1 bg-white dark:bg-gray-800 rounded-2xl p-3 text-center shadow-sm">
+            <div key={i} className="flex-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-3 text-center shadow-sm">
               <div className="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-sm mx-auto mb-2">
                 {item.step}
               </div>

@@ -27,14 +27,17 @@ npx vercel --prod --yes # 一键部署到公网
 | `/habits` | HabitsPage | 习惯CRUD+归档 |
 | `/history` | HistoryPage | 周/月/年完成率图+热力图 |
 | `/stats` | StatsPage | 统计卡片+趋势图+各习惯明细 |
+| `/leaderboard` | LeaderboardPage | 排行榜（周/月/连续/总榜）+领奖台+数据同步 |
 | `/auth` | AuthPage | 登录/注册（Supabase） |
 
 ## 架构
 
-- **Context**: `AuthContext`(用户) → `AppContext`(habits/checkins/pomodoro)
-- **存储**: `useLocalStorage` hook → key `habit-tracker`
+- **Context**: `AuthContext`(用户) → `AppContext`(habits/checkins/pomodoro) → `ProContext`(付费状态)
+- **存储**: `useLocalStorage` hook → key `habit-tracker`; Pro状态 → key `habit-pro`
 - **API**: addHabit, addCheckin, removeCheckin, getCheckinCount, isCheckedIn, startPomodoro, stopPomodoro, startBreak, incrementCycle
 - **音频**: `src/utils/audio.ts` — Web Audio API 环境音+钢琴曲+提示音
+- **排行榜同步**: `src/utils/leaderboardSync.ts` — 打卡时上报Supabase，拉取排名
+- **Pro系统**: `src/hooks/usePro.ts` — 免费限制(3习惯/7天统计) + 定价方案 ¥12月/¥168年/¥298终身; `src/components/PaywallModal.tsx` — 付费墙弹窗
 
 ## 数据模型
 

@@ -17,7 +17,12 @@ export default function StatsPage() {
   const now = new Date();
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4">
+    <div className="min-h-dvh relative" style={{ background: 'linear-gradient(180deg, #d4eaf7 0%, #e0f0f8 12%, #edf6fb 35%, #f7fafd 60%, #fdfefe 100%)' }}>
+      {/* 波浪底边 */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/4 pointer-events-none">
+        <div className="absolute bottom-0 left-0 right-0 h-full" style={{ background: 'linear-gradient(180deg, transparent, rgba(130,190,220,0.08), rgba(100,170,210,0.12))', clipPath: 'polygon(0% 70%, 10% 60%, 25% 68%, 40% 55%, 55% 65%, 70% 52%, 85% 62%, 100% 58%, 100% 100%, 0% 100%)' }} />
+      </div>
+    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">数据统计</h1>
       <p className="text-gray-400 dark:text-gray-500 mb-6">你的打卡数据总览</p>
 
@@ -73,6 +78,7 @@ export default function StatsPage() {
           />
         </div>
       )}
+    </div>
     </div>
   );
 }

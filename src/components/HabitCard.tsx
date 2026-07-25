@@ -49,10 +49,10 @@ export default function HabitCard({ habit, selectedDate }: Props) {
 
   return (
     <div
-      className={`rounded-2xl p-4 transition-all ${
+      className={`rounded-3xl p-4 transition-all duration-200 ${
         checked
-          ? 'bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-200 dark:border-indigo-700'
-          : 'bg-white dark:bg-gray-800 shadow-sm border-2 border-transparent'
+          ? 'bg-indigo-50/80 dark:bg-indigo-900/20 border-2 border-indigo-200/60 dark:border-indigo-700/40 shadow-md shadow-indigo-100/50'
+          : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-100 dark:border-gray-700/50 shadow-sm hover:shadow-md'
       }`}
     >
       <div className="flex items-center gap-4">

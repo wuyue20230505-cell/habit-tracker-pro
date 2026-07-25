@@ -2,6 +2,7 @@ import { createContext, useContext, useReducer, type ReactNode } from 'react';
 import type { AppState, AppAction, Habit, Checkin, ActivePomodoro } from '../types';
 import { generateId, today } from '../utils/date';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { syncToLeaderboard } from '../utils/leaderboardSync';
 
 const initialState: AppState = {
   habits: [],
@@ -126,11 +127,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     persistDispatch({ type: 'ADD_HABIT', payload: habit });
   };
 
+  // ── 同步排行榜 ────────────────────────────
+  const syncLB = (habits: Habit[], checkins: Checkin[]) => {
+    const pomodoroTotal = checkins.filter((c) =>
+      habits.some((h) => h.id === c.habitId && h.usePomodoro)
+    ).length;
+    syncToLeaderboard(habits, checkins, pomodoroTotal);
+  };
+
   const addCheckin = (habitId: string, date?: string) => {
     persistDispatch({
       type: 'ADD_CHECKIN',
       payload: { habitId, date: date || today() },
     });
+    const newCheckin: Checkin = { id: generateId(), habitId, date: date || today() };
+    syncLB(stateSnapshot.habits, [...stateSnapshot.checkins, newCheckin]);
   };
 
   const removeCheckin = (habitId: string, date?: string) => {
@@ -138,6 +149,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       type: 'REMOVE_CHECKIN',
       payload: { habitId, date: date || today() },
     });
+    const d = date || today();
+    const idx = [...stateSnapshot.checkins].reverse().findIndex(
+      (c) => c.habitId === habitId && c.date === d
+    );
+    if (idx !== -1) {
+      const realIdx = stateSnapshot.checkins.length - 1 - idx;
+      syncLB(stateSnapshot.habits, stateSnapshot.checkins.filter((_, i) => i !== realIdx));
+    }
   };
 
   const getCheckinCount = (habitId: string, date?: string): number => {

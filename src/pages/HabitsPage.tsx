@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useProCtx } from '../context/ProContext';
 import type { Habit } from '../types';
 import HabitForm from '../components/HabitForm';
 import EmptyState from '../components/EmptyState';
@@ -7,12 +8,19 @@ import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function HabitsPage() {
   const { state, addHabit, dispatch } = useApp();
+  const { isPro, checkHabitLimit } = useProCtx();
   const [formOpen, setFormOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const activeHabits = state.habits.filter((h) => !h.archived);
   const archivedHabits = state.habits.filter((h) => h.archived);
+
+  const handleNew = () => {
+    if (!checkHabitLimit(activeHabits.length)) return; // Pro 限制
+    setEditingHabit(null);
+    setFormOpen(true);
+  };
 
   const handleSave = (data: { name: string; emoji: string; color: string; frequency: { type: 'daily' } | { type: 'weekly'; count: number } | { type: 'monthly'; count: number }; usePomodoro: boolean; pomodoroMinutes: number; dailyGoal: number; excludeHolidays: boolean }) => {
     if (editingHabit) {
@@ -31,14 +39,21 @@ export default function HabitsPage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4">
+    <div className="min-h-dvh relative" style={{ background: 'linear-gradient(180deg, #f2f7e8 0%, #f6faf0 15%, #fafcf7 40%, #fdfef9 70%, #fefefc 100%)' }}>
+      {/* 花草光斑 */}
+      <div className="absolute top-8 right-10 w-16 h-16 rounded-full opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, #a5d6a7, transparent 70%)' }} />
+      <div className="absolute top-1/4 left-6 w-12 h-12 rounded-full opacity-15 pointer-events-none" style={{ background: 'radial-gradient(circle, #ffe082, transparent 70%)' }} />
+    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">习惯管理</h1>
-          <p className="text-gray-400 dark:text-gray-500 mt-1">{activeHabits.length} 个活跃习惯</p>
+          <p className="text-gray-400 dark:text-gray-500 mt-1">
+            {activeHabits.length} 个活跃习惯
+            {!isPro && <span className="text-amber-500 ml-1">· 免费版最多3个</span>}
+          </p>
         </div>
         <button
-          onClick={() => { setEditingHabit(null); setFormOpen(true); }}
+          onClick={handleNew}
           className="px-4 py-2 rounded-xl bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition-colors text-sm"
         >
           + 新建
@@ -134,6 +149,7 @@ export default function HabitsPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeletingId(null)}
       />
+    </div>
     </div>
   );
 }

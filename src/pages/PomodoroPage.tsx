@@ -6,7 +6,6 @@ import {
   getPlayingState,
   getSoundscapeType,
   getCurrentFileName,
-  loadLocalFile,
   type SoundscapeType,
 } from '../utils/audio';
 
@@ -23,7 +22,6 @@ export default function PomodoroPage() {
   const [soundscape, setSoundscape] = useState<SoundscapeType>(getSoundscapeType());
   const [isMusicPlaying, setIsMusicPlaying] = useState(getPlayingState());
   const [, setLocalFileName] = useState(getCurrentFileName());
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [workDuration, setWorkDuration] = useState(25);
   const [breakDuration, setBreakDuration] = useState(5);
@@ -94,10 +92,6 @@ export default function PomodoroPage() {
   };
 
   const handleSoundscape = (type: SoundscapeType) => {
-    if (type === 'file') {
-      fileInputRef.current?.click();
-      return;
-    }
     setSoundscape(type);
     setLocalFileName('');
     if (type === 'none') {
@@ -105,16 +99,6 @@ export default function PomodoroPage() {
       setIsMusicPlaying(false);
     } else {
       startSoundscape(type);
-      setIsMusicPlaying(true);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      loadLocalFile(file);
-      setSoundscape('file');
-      setLocalFileName(file.name);
       setIsMusicPlaying(true);
     }
   };
@@ -142,7 +126,8 @@ export default function PomodoroPage() {
   const strokeDashoffset = circumference * (1 - progress);
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4">
+    <div className="min-h-dvh relative" style={{ background: 'linear-gradient(180deg, #d4e8d0 0%, #c8e6c0 8%, #e8f5e3 25%, #f5faf2 50%, #fafcfa 100%)' }}>
+    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">番茄钟</h1>
       <p className="text-gray-400 dark:text-gray-500 mb-6">
         {sessionCount > 0 ? `已完成 ${sessionCount} 个番茄钟` : '专注工作，高效完成'}
@@ -297,12 +282,8 @@ export default function PomodoroPage() {
         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">🎵 专注音乐</h3>
         <div className="grid grid-cols-3 gap-2 mb-3">
           {([
-            { type: 'rain' as SoundscapeType, label: '🌧 雨声' },
+            { type: 'fire' as SoundscapeType, label: '🔥 火燃' },
             { type: 'ocean' as SoundscapeType, label: '🌊 海浪' },
-            { type: 'lofi' as SoundscapeType, label: '🌿 舒缓' },
-            { type: 'canon' as SoundscapeType, label: '🎻 卡农' },
-            { type: 'mariage' as SoundscapeType, label: '💒 梦婚' },
-            { type: 'file' as SoundscapeType, label: '📁 本地' },
             { type: 'none' as SoundscapeType, label: '🔇 关闭' },
           ]).map(({ type, label }) => (
             <button
@@ -318,14 +299,6 @@ export default function PomodoroPage() {
             </button>
           ))}
         </div>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="audio/*"
-          onChange={handleFileChange}
-          className="hidden"
-        />
 
         {/* Volume slider */}
         {(soundscape !== 'none' || isMusicPlaying) && (
@@ -344,6 +317,7 @@ export default function PomodoroPage() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

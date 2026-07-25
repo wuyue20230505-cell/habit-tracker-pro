@@ -17,7 +17,7 @@ export default function PomodoroOverlay() {
   const { activePomodoro } = state;
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
-  const [musicType, setMusicType] = useState<SoundscapeType>('rain');
+  const [musicType, setMusicType] = useState<SoundscapeType>('fire');
   const intervalRef = useRef<number | null>(null);
   const hasAlerted = useRef(false);
 
@@ -68,8 +68,8 @@ export default function PomodoroOverlay() {
   // Start music if not playing
   useEffect(() => {
     if (!getPlayingState()) {
-      startSoundscape('rain');
-      setMusicType('rain');
+      startSoundscape('fire');
+      setMusicType('fire');
     }
   }, []);
 
@@ -92,7 +92,7 @@ export default function PomodoroOverlay() {
   const handleMusicChange = (type: SoundscapeType) => {
     setMusicType(type);
     if (type === 'none') stopSoundscape();
-    else if (type !== 'file') startSoundscape(type);
+    else startSoundscape(type);
   };
 
   const fmt = (s: number) => {
@@ -143,13 +143,13 @@ export default function PomodoroOverlay() {
         {/* Music + cancel */}
         <div className="flex items-center justify-between mt-2 pt-2 border-t dark:border-gray-700">
           <div className="flex gap-1">
-            {(['rain', 'ocean', 'lofi', 'canon', 'mariage', 'none'] as SoundscapeType[]).map((type) => (
+            {(['fire', 'ocean', 'canon', 'mariage', 'fivehundred', 'none'] as SoundscapeType[]).map((type) => (
               <button
                 key={type}
                 onClick={() => handleMusicChange(type)}
                 className={`text-xs px-1 py-0.5 rounded ${musicType === type ? 'bg-indigo-100 dark:bg-indigo-900/30' : ''}`}
               >
-                {type === 'rain' ? '🌧' : type === 'ocean' ? '🌊' : type === 'lofi' ? '🌿' : type === 'canon' ? '🎻' : type === 'mariage' ? '💒' : '🔇'}
+                {type === 'fire' ? '🌧' : type === 'ocean' ? '🌊' : type === 'canon' ? '🎻' : type === 'mariage' ? '💒' : type === 'fivehundred' ? '🚂' : '🔇'}
               </button>
             ))}
           </div>
