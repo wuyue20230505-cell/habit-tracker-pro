@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ImageCarousel from '../components/ImageCarousel';
 import DownloadModal from '../components/DownloadModal';
 
 const FEATURES = [
@@ -48,22 +49,22 @@ export default function WelcomePage() {
   const [showDownload, setShowDownload] = useState(false);
 
   return (
-    <div className="min-h-dvh relative"
-      style={{ background: 'url(/bg-welcome.jpg) center/cover no-repeat fixed' }}
-    >
+    <div className="min-h-dvh relative">
+      <ImageCarousel images={['/welcome-1.jpg', '/welcome-2.jpg']} interval={6000} />
+      <div className="absolute inset-0 bg-black/25 z-[1]" />
       {/* Hero */}
       <div className="relative z-10 px-5 pt-10 pb-6 text-center">
         {user && (
-          <p className="text-xs text-indigo-400 mb-2">👋 {user.email || user.phone || '已登录'}</p>
+          <p className="text-xs text-indigo-300 mb-2 drop-shadow">👋 {user.email || user.phone || '已登录'}</p>
         )}
-        <div className="text-5xl mb-4 animate-bounce">🍅</div>
-        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">
+        <div className="text-5xl mb-4">🍅</div>
+        <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight drop-shadow-lg">
           习惯追踪
         </h1>
-        <p className="text-base text-gray-500 dark:text-gray-400 mb-1.5">
+        <p className="text-base text-white/80 mb-1.5 drop-shadow">
           让每一个好习惯，都开花结果
         </p>
-        <p className="text-sm text-gray-400 dark:text-gray-500 mb-6 leading-relaxed">
+        <p className="text-sm text-white/60 mb-6 leading-relaxed drop-shadow">
           习惯打卡 + 番茄钟专注 + 数据统计，一站式自律工具
         </p>
 
@@ -77,13 +78,13 @@ export default function WelcomePage() {
           <div className="flex gap-2.5">
             <button
               onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-              className="flex-1 py-2.5 rounded-2xl bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-medium border dark:border-gray-700 active:bg-gray-50"
+              className="flex-1 py-2.5 rounded-2xl bg-white/15 dark:bg-black/20 text-gray-600 dark:text-gray-300 text-sm font-medium border dark:border-gray-700 active:bg-gray-50"
             >
               了解更多
             </button>
             <button
               onClick={() => setShowDownload(true)}
-              className="flex-1 py-2.5 rounded-2xl bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-medium border dark:border-gray-700 active:bg-gray-50"
+              className="flex-1 py-2.5 rounded-2xl bg-white/15 dark:bg-black/20 text-gray-600 dark:text-gray-300 text-sm font-medium border dark:border-gray-700 active:bg-gray-50"
             >
               📱 安装APP
             </button>

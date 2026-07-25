@@ -37,7 +37,7 @@ export default function TodayPage() {
 
   return (
     <div className="min-h-dvh relative" style={{
-        background: 'url(/bg-checkin.jpg) center/cover no-repeat fixed',
+        background: 'url(/bg-checkin.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh',
       }}>
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <div className="mb-2">

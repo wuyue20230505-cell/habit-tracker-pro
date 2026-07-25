@@ -18,7 +18,7 @@ export default function PaywallModal({ open, reason, onClose }: Props) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
         <div
-          className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center"
+          className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center"
           onClick={(e) => e.stopPropagation()}
         >
           <span className="text-5xl block mb-4">🧾</span>
@@ -53,7 +53,7 @@ export default function PaywallModal({ open, reason, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
       <div
-        className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center max-h-[90vh] overflow-y-auto"
+        className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <span className="text-5xl block mb-4">⭐</span>
@@ -69,7 +69,7 @@ export default function PaywallModal({ open, reason, onClose }: Props) {
               onClick={() => purchase(key as 'yearly' | 'lifetime')}
               className={`w-full py-3.5 px-4 rounded-2xl border-2 text-left flex items-center justify-between transition-all active:scale-[0.98] ${
                 key === 'lifetime'
-                  ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 shadow-md'
+                  ? 'border-amber-400 bg-white/20 dark:bg-black/25 shadow-md'
                   : 'border-gray-200 dark:border-gray-600 hover:border-amber-300'
               }`}
             >

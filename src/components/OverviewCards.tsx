@@ -72,7 +72,7 @@ export default function OverviewCards({ habits, checkins, habitId }: Props) {
   return (
     <div className="grid grid-cols-2 gap-3">
       {cards.map((c) => (
-        <div key={c.label} className="bg-white dark:bg-gray-800 rounded-2xl p-4">
+        <div key={c.label} className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4">
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-1">
             <span>{c.icon}</span>
             <span>{c.label}</span>

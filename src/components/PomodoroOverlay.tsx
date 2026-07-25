@@ -103,7 +103,7 @@ export default function PomodoroOverlay() {
 
   return (
     <div className="fixed bottom-20 inset-x-0 z-40 flex justify-center pointer-events-none">
-      <div className="pointer-events-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border dark:border-gray-700 mx-4 p-4 w-full max-w-sm">
+      <div className="pointer-events-auto bg-white/15 dark:bg-black/20 rounded-2xl shadow-2xl border dark:border-gray-700 mx-4 p-4 w-full max-w-sm">
         {/* Click to go to timer page */}
         <button
           onClick={() => navigate('/pomodoro-timer')}

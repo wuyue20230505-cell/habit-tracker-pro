@@ -1,13 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  startSoundscape,
-  stopSoundscape,
-  setVolume,
-  getPlayingState,
-  getSoundscapeType,
-  getCurrentFileName,
-  type SoundscapeType,
-} from '../utils/audio';
+import MusicPicker from '../components/MusicPicker';
 
 type Mode = 'work' | 'break';
 
@@ -18,11 +10,6 @@ export default function PomodoroPage() {
   const [timeLeft, setTimeLeft] = useState(DEFAULT_WORK);
   const [isRunning, setIsRunning] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
-  const [volume, setVol] = useState(0.4);
-  const [soundscape, setSoundscape] = useState<SoundscapeType>(getSoundscapeType());
-  const [isMusicPlaying, setIsMusicPlaying] = useState(getPlayingState());
-  const [, setLocalFileName] = useState(getCurrentFileName());
-
   const [workDuration, setWorkDuration] = useState(25);
   const [breakDuration, setBreakDuration] = useState(5);
 
@@ -91,23 +78,6 @@ export default function PomodoroPage() {
     setTimeLeft(m === 'work' ? workDuration * 60 : breakDuration * 60);
   };
 
-  const handleSoundscape = (type: SoundscapeType) => {
-    setSoundscape(type);
-    setLocalFileName('');
-    if (type === 'none') {
-      stopSoundscape();
-      setIsMusicPlaying(false);
-    } else {
-      startSoundscape(type);
-      setIsMusicPlaying(true);
-    }
-  };
-
-  const handleVolumeChange = (v: number) => {
-    setVol(v);
-    setVolume(v);
-  };
-
   // cleanup on unmount
   useEffect(() => {
     return () => {
@@ -126,7 +96,7 @@ export default function PomodoroPage() {
   const strokeDashoffset = circumference * (1 - progress);
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'url(/bg-pomodoro.jpg) center/cover no-repeat fixed' }}>
+    <div className="min-h-dvh relative" style={{ background: 'url(/bg-pomodoro.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh' }}>
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">番茄钟</h1>
       <p className="text-gray-400 dark:text-gray-500 mb-6">
@@ -140,7 +110,7 @@ export default function PomodoroPage() {
             onClick={() => switchMode('work')}
             className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${
               mode === 'work'
-                ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-500'
+                ? 'bg-white/20 dark:bg-black/30 shadow-sm text-indigo-500'
                 : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
             }`}
           >
@@ -150,7 +120,7 @@ export default function PomodoroPage() {
             onClick={() => switchMode('break')}
             className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${
               mode === 'break'
-                ? 'bg-white dark:bg-gray-700 shadow-sm text-emerald-500'
+                ? 'bg-white/20 dark:bg-black/30 shadow-sm text-emerald-500'
                 : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
             }`}
           >
@@ -215,7 +185,7 @@ export default function PomodoroPage() {
       </div>
 
       {/* Duration settings */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-4">
+      <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4 mb-4">
         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">时长设置（分钟）</h3>
         <div className="flex gap-4">
           <div className="flex-1">
@@ -235,7 +205,7 @@ export default function PomodoroPage() {
                   setWorkDuration(v);
                   if (mode === 'work' && !isRunning) setTimeLeft(v * 60);
                 }}
-                className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+                className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm"
                 min={1}
               />
               <button
@@ -263,7 +233,7 @@ export default function PomodoroPage() {
                   setBreakDuration(v);
                   if (mode === 'break' && !isRunning) setTimeLeft(v * 60);
                 }}
-                className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+                className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm"
                 min={1}
               />
               <button
@@ -277,46 +247,8 @@ export default function PomodoroPage() {
         </div>
       </div>
 
-      {/* Music / Soundscape */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-4">
-        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">🎵 专注音乐</h3>
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          {([
-            { type: 'fire' as SoundscapeType, label: '🔥 火燃' },
-            { type: 'ocean' as SoundscapeType, label: '🌊 海浪' },
-            { type: 'none' as SoundscapeType, label: '🔇 关闭' },
-          ]).map(({ type, label }) => (
-            <button
-              key={type}
-              onClick={() => handleSoundscape(type)}
-              className={`p-2.5 rounded-xl text-center transition-all text-xs ${
-                soundscape === type && isMusicPlaying
-                  ? 'bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-300 dark:border-indigo-600'
-                  : 'bg-gray-50 dark:bg-gray-700/50 border-2 border-transparent hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Volume slider */}
-        {(soundscape !== 'none' || isMusicPlaying) && (
-          <div className="flex items-center gap-3">
-            <span className="text-sm">🔈</span>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.05"
-              value={volume}
-              onChange={(e) => handleVolumeChange(Number(e.target.value))}
-              className="flex-1 accent-indigo-500"
-            />
-            <span className="text-sm">🔊</span>
-          </div>
-        )}
-      </div>
+      {/* Music */}
+      <MusicPicker />
     </div>
     </div>
   );

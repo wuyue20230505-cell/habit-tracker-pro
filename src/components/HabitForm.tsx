@@ -70,7 +70,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40" onClick={onClose}>
       <div
-        className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl p-6 w-full sm:max-w-md max-h-[85vh] overflow-y-auto shadow-xl"
+        className="bg-white/15 dark:bg-black/20 rounded-t-2xl sm:rounded-2xl p-6 w-full sm:max-w-md max-h-[85vh] overflow-y-auto shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-bold mb-6">{habit ? '编辑习惯' : '新建习惯'}</h2>
@@ -81,7 +81,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="例如：每天喝8杯水"
-              className="w-full px-4 py-2.5 rounded-xl border dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2.5 rounded-xl border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               autoFocus
             />
           </div>
@@ -121,7 +121,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
                 type="number"
                 value={dailyGoal}
                 onChange={(e) => setDailyGoal(Math.max(1, Math.min(99, Number(e.target.value))))}
-                className="w-16 text-center py-1.5 rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+                className="w-16 text-center py-1.5 rounded-lg border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm"
                 min={1}
                 max={99}
               />
@@ -172,7 +172,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
                   type="number"
                   value={pomodoroMinutes}
                   onChange={(e) => setPomodoroMinutes(Math.max(5, Math.min(120, Number(e.target.value))))}
-                  className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+                  className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm"
                   min={5}
                   max={120}
                   step={5}

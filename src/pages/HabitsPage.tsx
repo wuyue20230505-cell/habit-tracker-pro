@@ -39,7 +39,7 @@ export default function HabitsPage() {
   };
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'url(/bg-habits.jpg) center/cover no-repeat fixed' }}>
+    <div className="min-h-dvh relative" style={{ background: 'url(/bg-habits.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh' }}>
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -68,7 +68,7 @@ export default function HabitsPage() {
           {activeHabits.map((h) => (
             <div
               key={h.id}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-4 flex items-center gap-3 shadow-sm"
+              className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4 flex items-center gap-3 shadow-sm"
             >
               <span className={`w-3 h-3 rounded-full ${h.color}`} />
               <span className="text-2xl">{h.emoji}</span>

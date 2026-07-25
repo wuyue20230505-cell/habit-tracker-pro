@@ -19,9 +19,10 @@ export default function Layout() {
   return (
     <div className="min-h-dvh flex flex-col">
       {/* Top bar with user */}
-      <div className="sticky top-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-100/60 dark:border-gray-700/40">
-        <div className="max-w-lg mx-auto flex items-center justify-between px-4 py-2">
-          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">习惯追踪</span>
+      <div className="sticky top-0 z-30">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
+        <div className="max-w-lg mx-auto flex items-center justify-between px-4 py-2 relative">
+          <span className="text-sm font-semibold text-white/90 drop-shadow-sm">习惯追踪</span>
           <div className="flex items-center gap-2">
             {!isPro && (
               <button
@@ -47,18 +48,19 @@ export default function Layout() {
         <Outlet />
       </main>
       <PomodoroOverlay />
-      <nav className="fixed bottom-0 inset-x-0 bg-white/85 dark:bg-gray-800/85 backdrop-blur-md border-t border-gray-100/60 dark:border-gray-700/40 z-30">
-        <div className="max-w-lg mx-auto flex justify-around py-1">
+      <nav className="fixed bottom-0 inset-x-0 z-30">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="max-w-lg mx-auto flex justify-around py-1 relative">
           {TABS.map((tab) => (
             <NavLink
               key={tab.to}
               to={tab.to}
               end={tab.to === '/checkin'}
               className={({ isActive }) =>
-                `flex flex-col items-center py-1.5 px-2 text-[10px] gap-0.5 transition-colors ${
+                `flex flex-col items-center py-1.5 px-2 text-[10px] gap-0.5 transition-colors drop-shadow-sm ${
                   isActive
-                    ? 'text-indigo-500'
-                    : 'text-gray-400 dark:text-gray-500'
+                    ? 'text-white scale-110'
+                    : 'text-white/60'
                 }`
               }
             >

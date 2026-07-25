@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
+import ImageCarousel from '../components/ImageCarousel';
 import {
   syncToLeaderboard,
   fetchLeaderboard,
@@ -165,7 +166,8 @@ export default function LeaderboardPage() {
   const myEntry = entries.find((e) => e.user_id === user?.id);
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'url(/bg-leaderboard.jpg) center/cover no-repeat fixed' }}>
+    <div className="min-h-dvh relative">
+      <ImageCarousel images={['/bg-leaderboard.jpg', '/leaderboard-2.jpg']} interval={6000} />
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">排行榜</h1>
@@ -177,7 +179,7 @@ export default function LeaderboardPage() {
 
       {/* 未登录提示 */}
       {!user && (
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 text-center mb-4">
+        <div className="bg-white/20 dark:bg-black/25 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 text-center mb-4">
           <p className="text-sm text-amber-600 dark:text-amber-400">
             📝 登录后才能上榜哦
           </p>
@@ -192,7 +194,7 @@ export default function LeaderboardPage() {
             onClick={() => setRankBy(tab.key)}
             className={`flex-1 py-2.5 px-1 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex flex-col items-center ${
               rankBy === tab.key
-                ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-500'
+                ? 'bg-white/20 dark:bg-black/30 shadow-sm text-indigo-500'
                 : 'text-gray-500'
             }`}
           >

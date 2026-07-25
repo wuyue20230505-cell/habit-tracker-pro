@@ -56,7 +56,7 @@ export default function MonthlyHeatmap({ checkins, habitId, year, month }: Props
   const weekHeaders = ['一', '二', '三', '四', '五', '六', '日'];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-4">
+    <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4">
       <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">本月打卡</h3>
       <div className="grid grid-cols-7 gap-1">
         {weekHeaders.map((w) => (

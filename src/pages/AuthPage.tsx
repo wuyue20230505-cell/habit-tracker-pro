@@ -62,7 +62,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-dvh bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
-      <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 w-full max-w-sm shadow-sm">
+      <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-3xl p-8 w-full max-w-sm shadow-sm">
         <div className="text-center mb-6">
           <span className="text-4xl">🍅</span>
           <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200 mt-2">习惯追踪</h1>
@@ -83,14 +83,14 @@ export default function AuthPage() {
 
         {tab === 'phone' && !showOtp ? (
           <form onSubmit={handlePhoneLogin} className="space-y-4">
-            <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="手机号（如 +8613800138000）" type="tel" className="w-full px-4 py-3 rounded-xl border dark:border-gray-600 bg-white dark:bg-gray-700 text-sm" />
+            <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="手机号（如 +8613800138000）" type="tel" className="w-full px-4 py-3 rounded-xl border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm" />
             <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-indigo-500 text-white font-semibold text-sm hover:bg-indigo-600 disabled:opacity-50">
               {loading ? '发送中...' : '发送验证码'}
             </button>
           </form>
         ) : tab === 'phone' && showOtp ? (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
-            <input value={otp} onChange={e => setOtp(e.target.value)} placeholder="输入6位验证码" className="w-full px-4 py-3 rounded-xl border dark:border-gray-600 bg-white dark:bg-gray-700 text-sm text-center text-lg tracking-widest" maxLength={6} />
+            <input value={otp} onChange={e => setOtp(e.target.value)} placeholder="输入6位验证码" className="w-full px-4 py-3 rounded-xl border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm text-center text-lg tracking-widest" maxLength={6} />
             <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-indigo-500 text-white font-semibold text-sm hover:bg-indigo-600 disabled:opacity-50">
               {loading ? '验证中...' : '验证登录'}
             </button>
@@ -98,8 +98,8 @@ export default function AuthPage() {
           </form>
         ) : (
           <form onSubmit={tab === 'login' ? handleEmailLogin : handleRegister} className="space-y-4">
-            <input value={email} onChange={e => setEmail(e.target.value)} placeholder="邮箱地址" type="email" autoComplete="email" className="w-full px-4 py-3 rounded-xl border dark:border-gray-600 bg-white dark:bg-gray-700 text-sm" />
-            <input value={password} onChange={e => setPassword(e.target.value)} placeholder="密码（至少6位）" type="password" autoComplete={tab === 'login' ? 'current-password' : 'new-password'} className="w-full px-4 py-3 rounded-xl border dark:border-gray-600 bg-white dark:bg-gray-700 text-sm" />
+            <input value={email} onChange={e => setEmail(e.target.value)} placeholder="邮箱地址" type="email" autoComplete="email" className="w-full px-4 py-3 rounded-xl border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm" />
+            <input value={password} onChange={e => setPassword(e.target.value)} placeholder="密码（至少6位）" type="password" autoComplete={tab === 'login' ? 'current-password' : 'new-password'} className="w-full px-4 py-3 rounded-xl border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm" />
             <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-indigo-500 text-white font-semibold text-sm hover:bg-indigo-600 disabled:opacity-50">
               {loading ? '处理中...' : tab === 'login' ? '登录' : '注册'}
             </button>

@@ -38,7 +38,7 @@ export default function WeeklyChart({ checkins, habitId }: Props) {
   }, [checkins, habitId]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-4">
+    <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4">
       <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">本周打卡</h3>
       <ResponsiveContainer width="100%" height={160}>
         <BarChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>

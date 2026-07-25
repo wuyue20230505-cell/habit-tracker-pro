@@ -33,7 +33,7 @@ export default function HabitBreakdown({ habits, checkins }: Props) {
   if (data.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-4">
+    <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4">
       <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">各习惯统计</h3>
       <div className="space-y-2">
         {data.map(({ habit, total, currentStreak, longestStreak, weekCheckins }) => (

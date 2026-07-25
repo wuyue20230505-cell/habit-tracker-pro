@@ -40,7 +40,7 @@ export default function FrequencyPicker({ value, onChange, excludeHolidays, onEx
             className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm">−</button>
           <input type="number" value={value.count}
             onChange={e => onChange({ ...value, count: Math.max(1, Math.min(value.type === 'weekly' ? 7 : 30, Number(e.target.value))) })}
-            className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+            className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm"
             min={1} max={value.type === 'weekly' ? 7 : 30} />
           <button type="button" onClick={() => onChange({ ...value, count: Math.min(value.type === 'weekly' ? 7 : 30, value.count + 1) })}
             className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm">+</button>

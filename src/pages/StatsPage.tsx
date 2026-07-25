@@ -17,7 +17,7 @@ export default function StatsPage() {
   const now = new Date();
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'url(/bg-stats.jpg) center/cover no-repeat fixed' }}>
+    <div className="min-h-dvh relative" style={{ background: 'url(/stats-1.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh' }}>
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">数据统计</h1>
       <p className="text-gray-400 dark:text-gray-500 mb-6">你的打卡数据总览</p>
@@ -30,7 +30,7 @@ export default function StatsPage() {
           <select
             value={habitId}
             onChange={(e) => setHabitId(e.target.value)}
-            className="w-full px-4 py-2 rounded-xl border dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+            className="w-full px-4 py-2 rounded-xl border dark:border-gray-600 bg-white/15 dark:bg-black/20 text-sm"
           >
             <option value="">全部习惯</option>
             {activeHabits.map((h) => (

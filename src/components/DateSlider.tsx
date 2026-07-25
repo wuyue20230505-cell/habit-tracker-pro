@@ -55,7 +55,7 @@ export default function DateSlider({ selectedDate, onChange }: Props) {
                 ? 'bg-indigo-500 text-white shadow-md'
                 : d.isToday
                   ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500'
-                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  : 'bg-white/15 dark:bg-black/20 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
             }`}
           >
             <div className="text-[10px]">{d.dayName}</div>

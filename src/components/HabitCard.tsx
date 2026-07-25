@@ -97,7 +97,7 @@ export default function HabitCard({ habit, selectedDate }: Props) {
       </div>
 
       {conflict && (
-        <div className="mt-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-sm text-amber-600 dark:text-amber-400 text-center animate-pulse">
+        <div className="mt-3 bg-white/20 dark:bg-black/25 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-sm text-amber-600 dark:text-amber-400 text-center animate-pulse">
           ⚠️ 上一个打卡还未完成，请等番茄钟结束后再开始新的
         </div>
       )}

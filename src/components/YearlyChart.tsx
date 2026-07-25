@@ -24,7 +24,7 @@ export default function YearlyChart({ checkins, habitId, year, onYearChange }: P
   }, [checkins, habitId, year]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-4">
+    <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-gray-700 dark:text-gray-300">年度打卡</h3>
         <div className="flex items-center gap-2">

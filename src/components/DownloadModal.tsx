@@ -12,7 +12,7 @@ export default function DownloadModal({ open, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
       <div
-        className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center max-h-[90vh] overflow-y-auto"
+        className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">📱 安装到手机</h2>
@@ -32,9 +32,9 @@ export default function DownloadModal({ open, onClose }: Props) {
         </div>
 
         {/* Method 2: QR Code */}
-        <div className="bg-white dark:bg-gray-700 rounded-2xl p-4 mb-4 border dark:border-gray-600">
+        <div className="bg-white/20 dark:bg-black/30 rounded-2xl p-4 mb-4 border dark:border-gray-600">
           <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">📷 扫码打开</h3>
-          <div className="bg-white rounded-xl p-2 mb-2 inline-block">
+          <div className="bg-white/20 rounded-xl p-2 mb-2 inline-block">
             <img src={qrApiUrl} alt="QR Code" className="w-36 h-36" />
           </div>
           <p className="text-xs text-gray-400">微信/浏览器扫码即可打开</p>

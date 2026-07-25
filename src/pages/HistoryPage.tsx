@@ -129,7 +129,7 @@ export default function HistoryPage() {
   const chartColor = viewMode === 'weekly' ? '#6366f1' : viewMode === 'monthly' ? '#10b981' : '#f59e0b';
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'url(/bg-checkin.jpg) center/cover no-repeat fixed' }}>
+    <div className="min-h-dvh relative" style={{ background: 'url(/bg-checkin.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh' }}>
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">历史记录</h1>
       <p className="text-gray-400 dark:text-gray-500 mb-6">打卡记录与完成率统计</p>
@@ -145,7 +145,7 @@ export default function HistoryPage() {
             <select
               value={habitId}
               onChange={(e) => setHabitId(e.target.value)}
-              className="flex-1 px-4 py-2 rounded-xl border dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+              className="flex-1 px-4 py-2 rounded-xl border dark:border-gray-600 bg-white/15 dark:bg-black/20 text-sm"
             >
               <option value="">全部习惯</option>
               {activeHabits.map((h) => (
@@ -167,7 +167,7 @@ export default function HistoryPage() {
                 onClick={() => setViewMode(key)}
                 className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${
                   viewMode === key
-                    ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-500'
+                    ? 'bg-white/20 dark:bg-black/30 shadow-sm text-indigo-500'
                     : 'text-gray-500'
                 }`}
               >
@@ -178,7 +178,7 @@ export default function HistoryPage() {
 
           {/* Chart or Heatmap */}
           {viewMode === 'heatmap' ? (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4">
+            <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4">
               <div className="flex justify-end mb-2">
                 <div className="flex items-center gap-1">
                   <button onClick={() => setYear(y => y - 1)} className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">←</button>
@@ -189,7 +189,7 @@ export default function HistoryPage() {
               <CalendarHeatmap checkins={checkins} habitId={habitId || undefined} year={year} />
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4">
+            <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4">
               <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 {viewMode === 'weekly' ? '每周打卡完成率 (%)' :
                  viewMode === 'monthly' ? '每月打卡完成率 (%)' : '每年打卡完成率 (%)'}
@@ -218,19 +218,19 @@ export default function HistoryPage() {
 
           {/* Quick stats */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-3 text-center">
+            <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-3 text-center">
               <div className="text-2xl font-bold text-indigo-500">
                 {weeklyData.length > 0 ? Math.round(weeklyData.reduce((s, w) => s + w.完成率, 0) / weeklyData.length) : 0}%
               </div>
               <div className="text-xs text-gray-400 mt-1">平均周完成率</div>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-3 text-center">
+            <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-3 text-center">
               <div className="text-2xl font-bold text-emerald-500">
                 {monthlyData.length > 0 ? Math.round(monthlyData.reduce((s, m) => s + m.完成率, 0) / monthlyData.length) : 0}%
               </div>
               <div className="text-xs text-gray-400 mt-1">平均月完成率</div>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-3 text-center">
+            <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-3 text-center">
               <div className="text-2xl font-bold text-amber-500">{checkins.length}</div>
               <div className="text-xs text-gray-400 mt-1">总打卡次数</div>
             </div>
