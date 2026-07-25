@@ -143,13 +143,13 @@ export default function PomodoroOverlay() {
         {/* Music + cancel */}
         <div className="flex items-center justify-between mt-2 pt-2 border-t dark:border-gray-700">
           <div className="flex gap-1">
-            {(['fire', 'ocean', 'canon', 'mariage', 'fivehundred', 'none'] as SoundscapeType[]).map((type) => (
+            {(['fire', 'rain2', 'ocean', 'canon', 'mariage', 'fate', 'fivehundred', 'none'] as SoundscapeType[]).map((type) => (
               <button
                 key={type}
                 onClick={() => handleMusicChange(type)}
                 className={`text-xs px-1 py-0.5 rounded ${musicType === type ? 'bg-indigo-100 dark:bg-indigo-900/30' : ''}`}
               >
-                {type === 'fire' ? '🌧' : type === 'ocean' ? '🌊' : type === 'canon' ? '🎻' : type === 'mariage' ? '💒' : type === 'fivehundred' ? '🚂' : '🔇'}
+                {type === 'fire' ? '🌧' : type === 'ocean' ? '🌊' : type === 'canon' ? '🎻' : type === 'mariage' ? '💒' : type === 'fivehundred' ? '🚂' : type === 'fate' ? '🎺' : type === 'rain2' ? '💧' : '🔇'}
               </button>
             ))}
           </div>

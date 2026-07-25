@@ -69,28 +69,24 @@ function getCtx(): AudioContext {
 function playBlob(_name: string, blob: Blob) {
   stopSoundscape();
   const url = URL.createObjectURL(blob);
-  const audio = new Audio(url); audio.loop = true; audio.volume = 0.4;
+  const audio = new Audio(url); audio.loop = true; audio.volume = 0.8;
   const c = getCtx(); if (c.state === 'suspended') c.resume();
-  masterGain = c.createGain(); masterGain.gain.value = 0.4; masterGain.connect(c.destination);
+  masterGain = c.createGain(); masterGain.gain.value = 0.85; masterGain.connect(c.destination);
   c.createMediaElementSource(audio).connect(masterGain);
   audio.play().catch(() => {});
   htmlAudios = [audio];
 }
 
 // ── 内置音乐（public/ 目录的 MP3 文件）──
-function playBuiltinFile(src: string, type: SoundscapeType) {
-  stopSoundscape();
-  const audio = new Audio(src); audio.loop = true; audio.volume = 0.4;
-  const c = getCtx(); if (c.state === 'suspended') c.resume();
-  masterGain = c.createGain(); masterGain.gain.value = 0.4; masterGain.connect(c.destination);
-  c.createMediaElementSource(audio).connect(masterGain);
+function playBuiltinFile(src: string) {
+  const audio = new Audio(src); audio.loop = true; audio.volume = 0.8;
+  // 简单直接：不经过 Web Audio 路由，避免 createMediaElementSource 的各种坑
   audio.play().catch(() => {});
-  htmlAudios = [audio];
-  isPlaying = true; currentType = type; currentFileName = '';
+  htmlAudios.push(audio);
 }
 
 // ── Public API ──
-export type SoundscapeType = 'fire' | 'ocean' | 'canon' | 'mariage' | 'fivehundred' | 'slot0' | 'slot1' | 'slot2' | 'none';
+export type SoundscapeType = 'fire' | 'ocean' | 'canon' | 'mariage' | 'fivehundred' | 'fate' | 'rain2' | 'slot0' | 'slot1' | 'slot2' | 'none';
 
 export function getPlayingState(): boolean { return isPlaying; }
 export function getSoundscapeType(): SoundscapeType { return currentType; }
@@ -121,20 +117,24 @@ export function startSoundscape(type: SoundscapeType): void {
   stopSoundscape();
 
   const c = getCtx(); if (c.state === 'suspended') c.resume();
-  masterGain = c.createGain(); masterGain.gain.value = 0.4; masterGain.connect(c.destination);
+  masterGain = c.createGain(); masterGain.gain.value = 0.85; masterGain.connect(c.destination);
 
   currentType = type; isPlaying = true; currentFileName = '';
 
   if (type === 'fire') {
-    playBuiltinFile('/rain.mp3', 'fire');
+    playBuiltinFile('/rain.mp3');
   } else if (type === 'ocean') {
-    playBuiltinFile('/ocean.mp3', 'ocean');
+    playBuiltinFile('/ocean.mp3');
   } else if (type === 'canon') {
-    playBuiltinFile('/canon.mp3', 'canon');
+    playBuiltinFile('/canon.mp3');
   } else if (type === 'mariage') {
-    playBuiltinFile('/mariage.mp3', 'mariage');
+    playBuiltinFile('/mariage.mp3');
   } else if (type === 'fivehundred') {
-    playBuiltinFile('/fivehundred.mp3', 'fivehundred');
+    playBuiltinFile('/fivehundred.mp3');
+  } else if (type === 'fate') {
+    playBuiltinFile('/fate.mp3');
+  } else if (type === 'rain2') {
+    playBuiltinFile('/rain2.mp3');
   }
 }
 

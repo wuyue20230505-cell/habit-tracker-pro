@@ -36,13 +36,10 @@ export default function TodayPage() {
   const completedCount = todaysHabits.filter((h) => isCheckedIn(h.id, selectedDate)).length;
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'linear-gradient(180deg, #ffecd2 0%, #fcb69f 5%, #ffe8d6 20%, #fef9f5 45%, #fdf8f0 100%)' }}>
-      {/* 太阳 */}
-      <div className="absolute top-6 right-6 w-20 h-20 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(255,244,220,0.8), rgba(255,200,140,0.3), transparent 70%)' }} />
-      {/* 柔云 */}
-      <div className="absolute top-12 left-4 w-32 h-10 rounded-full blur-lg pointer-events-none" style={{ background: 'rgba(255,255,255,0.35)' }} />
-      <div className="absolute top-20 left-1/3 w-24 h-8 rounded-full blur-lg pointer-events-none" style={{ background: 'rgba(255,255,255,0.25)' }} />
-    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
+    <div className="min-h-dvh relative" style={{
+        background: 'url(/bg-checkin.jpg) center/cover no-repeat fixed',
+      }}>
+<div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <div className="mb-2">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
           {isToday ? '今日打卡' : '打卡记录'}

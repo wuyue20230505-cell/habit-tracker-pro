@@ -165,13 +165,8 @@ export default function LeaderboardPage() {
   const myEntry = entries.find((e) => e.user_id === user?.id);
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'linear-gradient(180deg, #d4d9f0 0%, #dde1f5 10%, #e8ecfa 30%, #f5f6fd 55%, #fafafe 100%)' }}>
-      {/* 山峰层叠 */}
-      <div className="absolute bottom-0 left-0 right-0 h-1/3 pointer-events-none">
-        <div className="absolute bottom-0 left-0 right-0 h-2/3" style={{ background: 'linear-gradient(180deg, transparent, rgba(140,150,200,0.08), rgba(120,135,190,0.12))', clipPath: 'polygon(0% 80%, 15% 45%, 30% 65%, 50% 35%, 65% 55%, 80% 40%, 100% 60%, 100% 100%, 0% 100%)' }} />
-        <div className="absolute bottom-0 left-0 right-0 h-1/2" style={{ background: 'linear-gradient(180deg, transparent, rgba(160,170,210,0.06), rgba(140,155,200,0.1))', clipPath: 'polygon(0% 70%, 20% 50%, 35% 60%, 55% 40%, 70% 55%, 85% 45%, 100% 65%, 100% 100%, 0% 100%)' }} />
-      </div>
-    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
+    <div className="min-h-dvh relative" style={{ background: 'url(/bg-leaderboard.jpg) center/cover no-repeat fixed' }}>
+<div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">排行榜</h1>
         {lastSync && (

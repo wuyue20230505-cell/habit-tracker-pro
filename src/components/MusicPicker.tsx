@@ -9,9 +9,11 @@ import {
 // 内置声音
 const BUILTIN: { type: SoundscapeType; icon: string; label: string }[] = [
   { type: 'fire',       icon: '🌧️', label: '雨声' },
+  { type: 'rain2',      icon: '💧', label: '雨声2' },
   { type: 'ocean',      icon: '🌊', label: '海浪' },
-  { type: 'canon',      icon: '🎻', label: 'Canon in D' },
+  { type: 'canon',      icon: '🎻', label: 'Canon' },
   { type: 'mariage',    icon: '💒', label: 'Mariage' },
+  { type: 'fate',       icon: '🎺', label: '命运' },
   { type: 'fivehundred',icon: '🚂', label: '500 Miles' },
 ];
 

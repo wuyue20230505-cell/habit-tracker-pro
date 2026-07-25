@@ -126,8 +126,8 @@ export default function PomodoroPage() {
   const strokeDashoffset = circumference * (1 - progress);
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'linear-gradient(180deg, #d4e8d0 0%, #c8e6c0 8%, #e8f5e3 25%, #f5faf2 50%, #fafcfa 100%)' }}>
-    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
+    <div className="min-h-dvh relative" style={{ background: 'url(/bg-pomodoro.jpg) center/cover no-repeat fixed' }}>
+<div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">番茄钟</h1>
       <p className="text-gray-400 dark:text-gray-500 mb-6">
         {sessionCount > 0 ? `已完成 ${sessionCount} 个番茄钟` : '专注工作，高效完成'}

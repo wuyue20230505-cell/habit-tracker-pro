@@ -129,9 +129,8 @@ export default function HistoryPage() {
   const chartColor = viewMode === 'weekly' ? '#6366f1' : viewMode === 'monthly' ? '#10b981' : '#f59e0b';
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'linear-gradient(180deg, #ffe8d0 0%, #fde4cc 10%, #fef0e4 30%, #fef8f2 55%, #fefcf8 100%)' }}>
-      <div className="absolute top-4 right-6 w-16 h-16 rounded-full opacity-25 pointer-events-none" style={{ background: 'radial-gradient(circle, #ffcc80, transparent 70%)' }} />
-    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
+    <div className="min-h-dvh relative" style={{ background: 'url(/bg-checkin.jpg) center/cover no-repeat fixed' }}>
+<div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">历史记录</h1>
       <p className="text-gray-400 dark:text-gray-500 mb-6">打卡记录与完成率统计</p>
 

@@ -49,14 +49,8 @@ export default function WelcomePage() {
 
   return (
     <div className="min-h-dvh relative"
-      style={{
-        background: 'linear-gradient(180deg, #f8f7ff 0%, #fdfcfd 20%, #f5f3ff 60%, #faf9fe 100%)',
-      }}
+      style={{ background: 'url(/bg-welcome.jpg) center/cover no-repeat fixed' }}
     >
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-20 w-80 h-80 rounded-full opacity-[0.08]" style={{ background: 'radial-gradient(circle, #818cf8, transparent 70%)' }} />
-        <div className="absolute top-1/3 -left-32 w-96 h-96 rounded-full opacity-[0.05]" style={{ background: 'radial-gradient(circle, #a78bfa, transparent 70%)' }} />
-      </div>
       {/* Hero */}
       <div className="relative z-10 px-5 pt-10 pb-6 text-center">
         {user && (

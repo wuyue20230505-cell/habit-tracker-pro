@@ -39,11 +39,8 @@ export default function HabitsPage() {
   };
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'linear-gradient(180deg, #f2f7e8 0%, #f6faf0 15%, #fafcf7 40%, #fdfef9 70%, #fefefc 100%)' }}>
-      {/* 花草光斑 */}
-      <div className="absolute top-8 right-10 w-16 h-16 rounded-full opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, #a5d6a7, transparent 70%)' }} />
-      <div className="absolute top-1/4 left-6 w-12 h-12 rounded-full opacity-15 pointer-events-none" style={{ background: 'radial-gradient(circle, #ffe082, transparent 70%)' }} />
-    <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
+    <div className="min-h-dvh relative" style={{ background: 'url(/bg-habits.jpg) center/cover no-repeat fixed' }}>
+<div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">习惯管理</h1>

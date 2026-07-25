@@ -105,15 +105,9 @@ export default function PomodoroTimerPage() {
 
   return (
     <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-8 relative"
-      style={{ background: 'linear-gradient(180deg, #d4e8d0 0%, #c8e6c0 8%, #e8f5e3 25%, #f5faf2 50%, #fafcfa 100%)' }}
+      style={{ background: 'url(/bg-pomodoro.jpg) center/cover no-repeat fixed' }}
     >
-      {/* 树影光斑 */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-4 left-4 w-16 h-16 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #a5d6a7, transparent 70%)' }} />
-        <div className="absolute top-12 right-8 w-20 h-20 rounded-full opacity-15" style={{ background: 'radial-gradient(circle, #81c784, transparent 70%)' }} />
-        <div className="absolute top-1/3 left-1/2 w-24 h-24 rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #c8e6c9, transparent 70%)' }} />
-      </div>
-      {/* Header */}
+  {/* Header */}
       <div className="text-center mb-8 relative z-10">
         <span className="text-4xl">{activePomodoro.habitEmoji}</span>
         <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200 mt-2">{activePomodoro.habitName}</h1>
