@@ -129,10 +129,10 @@ export default function HistoryPage() {
   const chartColor = viewMode === 'weekly' ? '#6366f1' : viewMode === 'monthly' ? '#10b981' : '#f59e0b';
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'url(/bg-checkin.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh' }}>
+    <div className="min-h-dvh relative" style={{ background: 'url(/bg-checkin.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh', filter: 'saturate(1.08) brightness(1.04) contrast(1.05)' }}>
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
-      <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">历史记录</h1>
-      <p className="text-gray-400 dark:text-gray-500 mb-6">打卡记录与完成率统计</p>
+      <h1 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">历史记录</h1>
+      <p className="text-white/80 drop-shadow mb-6">打卡记录与完成率统计</p>
 
       {activeHabits.length === 0 ? (
         <EmptyState icon="📅" title="还没有习惯" description="先创建习惯才能查看历史记录" />
@@ -155,7 +155,7 @@ export default function HistoryPage() {
           </div>
 
           {/* View mode tabs */}
-          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+          <div className="flex bg-white/10 dark:bg-white/5 rounded-xl p-1">
             {([
               { key: 'weekly' as ViewMode, label: '本周率' },
               { key: 'monthly' as ViewMode, label: '月完成率' },
@@ -181,9 +181,9 @@ export default function HistoryPage() {
             <div className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-2xl p-4">
               <div className="flex justify-end mb-2">
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setYear(y => y - 1)} className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">←</button>
+                  <button onClick={() => setYear(y => y - 1)} className="px-2 py-1 rounded hover:bg-white/15 dark:hover:bg-white/10 text-sm">←</button>
                   <span className="text-sm font-medium w-12 text-center">{year}</span>
-                  <button onClick={() => setYear(y => y + 1)} className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">→</button>
+                  <button onClick={() => setYear(y => y + 1)} className="px-2 py-1 rounded hover:bg-white/15 dark:hover:bg-white/10 text-sm">→</button>
                 </div>
               </div>
               <CalendarHeatmap checkins={checkins} habitId={habitId || undefined} year={year} />

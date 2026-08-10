@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function HabitCard({ habit, selectedDate }: Props) {
-  const { addCheckin, removeCheckin, getCheckinCount, isCheckedIn, startPomodoro, state } = useApp();
+  const { addCheckin, getCheckinCount, isCheckedIn, startPomodoro, state } = useApp();
   const navigate = useNavigate();
   const [conflict, setConflict] = useState(false);
   const date = selectedDate;
@@ -23,13 +23,42 @@ export default function HabitCard({ habit, selectedDate }: Props) {
     checked ? date : new Date(new Date(date).setDate(new Date(date).getDate() - 1)).toISOString().slice(0, 10)
   );
 
-  // Count pomodoro cycles completed today for this habit
-  const pomodoroCyclesToday = useMemo(() => {
-    // Each checkin represents one completed pomodoro cycle
-    return getCheckinCount(habit.id, date);
-  }, [state.checkins, habit.id, date]);
+  // 计算周期进度（每周/每月已完成多少天）
+  const periodProgress = useMemo(() => {
+    if (habit.frequency.type === 'daily') return null;
+
+    const checkins = state.checkins.filter(c => c.habitId === habit.id);
+
+    if (habit.frequency.type === 'weekly') {
+      const dt = new Date(date + 'T00:00:00');
+      const day = dt.getDay();
+      const monday = new Date(dt);
+      monday.setDate(dt.getDate() - (day === 0 ? 6 : day - 1));
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const mondayStr = monday.toISOString().slice(0, 10);
+      const sundayStr = sunday.toISOString().slice(0, 10);
+      const days = new Set(
+        checkins.filter(c => c.date >= mondayStr && c.date <= sundayStr).map(c => c.date)
+      );
+      return { current: Math.min(days.size, (habit.frequency as { type: 'weekly'; count: number }).count), total: (habit.frequency as { type: 'weekly'; count: number }).count, label: '天/周' };
+    }
+
+    if (habit.frequency.type === 'monthly') {
+      const monthPrefix = date.slice(0, 7);
+      const days = new Set(
+        checkins.filter(c => c.date.startsWith(monthPrefix)).map(c => c.date)
+      );
+      return { current: Math.min(days.size, (habit.frequency as { type: 'monthly'; count: number }).count), total: (habit.frequency as { type: 'monthly'; count: number }).count, label: '天/月' };
+    }
+
+    return null;
+  }, [state.checkins, habit.id, habit.frequency, date]);
 
   const handleCheckin = () => {
+    // 每日打卡次数已达上限（番茄钟和普通打卡都受此限制）
+    if (count >= goal) return;
+
     if (habit.usePomodoro && !checked) {
       if (state.activePomodoro) {
         setConflict(true);
@@ -40,11 +69,7 @@ export default function HabitCard({ habit, selectedDate }: Props) {
       navigate('/pomodoro-timer');
       return;
     }
-    if (!checked) {
-      addCheckin(habit.id, date);
-    } else {
-      removeCheckin(habit.id, date);
-    }
+    addCheckin(habit.id, date);
   };
 
   return (
@@ -52,7 +77,7 @@ export default function HabitCard({ habit, selectedDate }: Props) {
       className={`rounded-3xl p-4 transition-all duration-200 ${
         checked
           ? 'bg-indigo-50/80 dark:bg-indigo-900/20 border-2 border-indigo-200/60 dark:border-indigo-700/40 shadow-md shadow-indigo-100/50'
-          : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-100 dark:border-gray-700/50 shadow-sm hover:shadow-md'
+          : 'bg-white/20 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-100 dark:border-gray-700/50 shadow-sm hover:shadow-md'
       }`}
     >
       <div className="flex items-center gap-4">
@@ -61,7 +86,7 @@ export default function HabitCard({ habit, selectedDate }: Props) {
           className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-xl sm:text-2xl transition-all active:scale-90 shrink-0 ${
             checked
               ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
-              : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+              : 'bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/15'
           }`}
         >
           {checked ? '✓' : habit.emoji}
@@ -71,29 +96,30 @@ export default function HabitCard({ habit, selectedDate }: Props) {
           <h3 className="font-semibold text-gray-800 dark:text-gray-200 truncate text-sm sm:text-base">{habit.name}</h3>
           <div className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-0.5 flex-wrap">
             <span>🔥 {current} 天</span>
-            {goal > 1 && (
+            {/* 每日打卡进度，始终显示 */}
+            <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+              count >= goal ? 'bg-indigo-500/20 dark:bg-indigo-500/20 text-indigo-500' : 'bg-white/10 dark:bg-white/5'
+            }`}>
+              {Math.min(count, goal)}/{goal}
+            </span>
+            {/* 周/月周期进度（已完成多少天） */}
+            {periodProgress && (
               <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                checked ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-500' : 'bg-gray-100 dark:bg-gray-700'
+                periodProgress.current >= periodProgress.total ? 'bg-indigo-500/20 dark:bg-indigo-500/20 text-indigo-500' : 'bg-white/10 dark:bg-white/5'
               }`}>
-                {count}/{goal}
+                {periodProgress.current}/{periodProgress.total}{periodProgress.label}
               </span>
             )}
             {habit.usePomodoro && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-500">
-                🍅{pomodoroCyclesToday > 0 ? `×${pomodoroCyclesToday}` : ` ${habit.pomodoroMinutes || 25}分钟`}
+              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                count >= goal ? 'bg-indigo-500/20 dark:bg-indigo-500/20 text-indigo-500' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-500'
+              }`}>
+                🍅{count > 0 ? `${Math.min(count, goal)}/${goal}` : ` ${habit.pomodoroMinutes || 25}分钟`}
               </span>
             )}
           </div>
         </div>
 
-        {goal > 1 && !checked && count > 0 && (
-          <button
-            onClick={() => removeCheckin(habit.id, date)}
-            className="text-sm px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-400"
-          >
-            −
-          </button>
-        )}
       </div>
 
       {conflict && (

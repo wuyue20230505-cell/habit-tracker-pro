@@ -74,21 +74,22 @@ export default function PaywallModal({ open, reason, onClose }: Props) {
               }`}
             >
               <div>
-                <div className="font-bold text-gray-800 dark:text-gray-200 text-sm flex items-center gap-2">
+                <div className="font-bold text-white text-sm flex items-center gap-2">
                   {plan.label}
-                  {key === 'lifetime' && (
-                    <span className="text-[10px] bg-amber-400 text-white px-1.5 py-0.5 rounded-full">
-                      最值
-                    </span>
+                  {key === 'lifetime' ? (
+                    <span className="text-[10px] bg-red-400 text-white px-1.5 py-0.5 rounded-full">限时</span>
+                  ) : (
+                    <span className="text-[10px] bg-amber-400 text-white px-1.5 py-0.5 rounded-full">优惠</span>
                   )}
                 </div>
-                <div className="text-[11px] text-gray-400">
-                  {plan.period === '年' ? '月均 ¥1，零压力付费' : '一次付费永久使用，省 ¥12'}
+                <div className="text-[11px] text-white/50">
+                  {plan.period === '年' ? '月均不到 ¥1' : '一次付费永久使用'}
                 </div>
               </div>
-              <span className="text-lg font-bold text-gray-800 dark:text-gray-200">
-                ¥{plan.price}
-              </span>
+              <div className="text-right">
+                <span className="text-xs text-white/30 line-through mr-1">¥{(plan as any).originalPrice}</span>
+                <span className="text-lg font-bold text-amber-400">¥{plan.price}</span>
+              </div>
             </button>
           ))}
         </div>

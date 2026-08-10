@@ -53,10 +53,10 @@ export default function CalendarHeatmap({ checkins, habitId, year }: Props) {
 
   function colorClass(count: number): string {
     if (count < 0) return 'invisible';
-    if (count === 0) return 'bg-gray-100 dark:bg-gray-800';
+    if (count === 0) return 'bg-white/10 dark:bg-white/5';
     const level = Math.ceil((count / maxCount) * 4);
     const colors = [
-      'bg-gray-100 dark:bg-gray-800',
+      'bg-white/10 dark:bg-white/5',
       'bg-indigo-200 dark:bg-indigo-900',
       'bg-indigo-300 dark:bg-indigo-700',
       'bg-indigo-400 dark:bg-indigo-500',

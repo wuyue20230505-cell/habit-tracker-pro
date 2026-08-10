@@ -39,11 +39,11 @@ export default function ImageCarousel({ images, interval = 6000, className = '' 
 
   return (
     <div ref={containerRef} className={`absolute inset-0 ${className}`}>
-      {images.map((img, i) => (
+      {images.map((img) => (
         <div
           key={img}
           className="carousel-layer absolute inset-0 bg-cover bg-center transition-opacity duration-[2000ms] ease-in-out opacity-0"
-          style={{ backgroundImage: `url(${img})` }}
+          style={{ backgroundImage: `url(${img})`, filter: 'saturate(1.08) brightness(1.04) contrast(1.05)' }}
         />
       ))}
     </div>

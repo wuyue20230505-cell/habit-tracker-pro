@@ -24,7 +24,7 @@ export default function FrequencyPicker({ value, onChange, excludeHolidays, onEx
               else onChange({ type: 'monthly', count: 10 });
             }}
             className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-              value.type === type ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200'
+              value.type === type ? 'bg-indigo-500 text-white' : 'bg-white/10 dark:bg-white/5 hover:bg-gray-200'
             }`}>
             {label}
           </button>
@@ -37,13 +37,13 @@ export default function FrequencyPicker({ value, onChange, excludeHolidays, onEx
             {value.type === 'weekly' ? '每周' : '每月'}
           </span>
           <button type="button" onClick={() => onChange({ ...value, count: Math.max(1, value.count - 1) })}
-            className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm">−</button>
+            className="w-8 h-8 rounded-lg bg-white/10 dark:bg-white/5 text-sm">−</button>
           <input type="number" value={value.count}
             onChange={e => onChange({ ...value, count: Math.max(1, Math.min(value.type === 'weekly' ? 7 : 30, Number(e.target.value))) })}
-            className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm"
+            className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white/10 dark:bg-black/20 text-sm appearance-none"
             min={1} max={value.type === 'weekly' ? 7 : 30} />
           <button type="button" onClick={() => onChange({ ...value, count: Math.min(value.type === 'weekly' ? 7 : 30, value.count + 1) })}
-            className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm">+</button>
+            className="w-8 h-8 rounded-lg bg-white/10 dark:bg-white/5 text-sm">+</button>
           <span className="text-xs text-gray-400">天</span>
         </div>
       )}

@@ -17,10 +17,10 @@ export default function StatsPage() {
   const now = new Date();
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'url(/stats-1.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh' }}>
+    <div className="min-h-dvh relative" style={{ background: 'url(/stats-1.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh', filter: 'saturate(1.08) brightness(1.04) contrast(1.05)' }}>
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
-      <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">数据统计</h1>
-      <p className="text-gray-400 dark:text-gray-500 mb-6">你的打卡数据总览</p>
+      <h1 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">数据统计</h1>
+      <p className="text-white/80 drop-shadow mb-6">你的打卡数据总览</p>
 
       {activeHabits.length === 0 ? (
         <EmptyState icon="📊" title="还没有数据" description="创建习惯并开始打卡后，这里会显示统计数据" />
@@ -41,6 +41,7 @@ export default function StatsPage() {
           <OverviewCards
             habits={state.habits}
             checkins={state.checkins}
+            pomodoroRecords={state.pomodoroRecords}
             habitId={habitId || undefined}
           />
 

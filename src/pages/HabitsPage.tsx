@@ -39,12 +39,12 @@ export default function HabitsPage() {
   };
 
   return (
-    <div className="min-h-dvh relative" style={{ background: 'url(/bg-habits.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh' }}>
+    <div className="min-h-dvh relative" style={{ background: 'url(/bg-habits.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh', filter: 'saturate(1.08) brightness(1.04) contrast(1.05)' }}>
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">习惯管理</h1>
-          <p className="text-gray-400 dark:text-gray-500 mt-1">
+          <p className="text-white/80 drop-shadow mt-1">
             {activeHabits.length} 个活跃习惯
             {!isPro && <span className="text-amber-500 ml-1">· 免费版最多3个</span>}
           </p>
@@ -64,7 +64,7 @@ export default function HabitsPage() {
           description="点击右上角新建按钮创建你的第一个习惯"
         />
       ) : (
-        <div className="space-y-2">
+        <div className={`space-y-2 ${formOpen ? 'hidden' : ''}`}>
           {activeHabits.map((h) => (
             <div
               key={h.id}
@@ -82,13 +82,13 @@ export default function HabitsPage() {
               </div>
               <button
                 onClick={() => { setEditingHabit(h); setFormOpen(true); }}
-                className="text-sm px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="text-sm px-3 py-1.5 rounded-lg bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/15"
               >
                 编辑
               </button>
               <button
                 onClick={() => dispatch({ type: 'ARCHIVE_HABIT', payload: h.id })}
-                className="text-sm px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="text-sm px-3 py-1.5 rounded-lg bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/15"
               >
                 归档
               </button>
@@ -103,7 +103,7 @@ export default function HabitsPage() {
 
           {archivedHabits.length > 0 && (
             <div className="mt-6">
-              <h2 className="text-sm font-medium text-gray-400 dark:text-gray-500 mb-2">已归档</h2>
+              <h2 className="text-sm font-medium white/80 drop-shadow mb-2">已归档</h2>
               {archivedHabits.map((h) => (
                 <div
                   key={h.id}
@@ -115,7 +115,7 @@ export default function HabitsPage() {
                   </div>
                   <button
                     onClick={() => dispatch({ type: 'ARCHIVE_HABIT', payload: h.id })}
-                    className="text-sm px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    className="text-sm px-3 py-1.5 rounded-lg bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/15"
                   >
                     恢复
                   </button>

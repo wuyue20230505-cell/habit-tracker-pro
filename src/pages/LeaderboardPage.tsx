@@ -1,20 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useApp } from '../context/AppContext';
 import ImageCarousel from '../components/ImageCarousel';
 import {
-  syncToLeaderboard,
   fetchLeaderboard,
-  fetchMyRank,
   type LeaderboardEntry,
   type RankBy,
 } from '../utils/leaderboardSync';
 
-const TABS: { key: RankBy; label: string; icon: string; desc: string }[] = [
-  { key: 'weekly_checkins',  label: '周榜', icon: '🔥', desc: '本周打卡最多' },
-  { key: 'month_checkins',   label: '月榜', icon: '📅', desc: '本月打卡最多' },
-  { key: 'current_streak',   label: '连续', icon: '⚡', desc: '连续打卡最长' },
-  { key: 'total_checkins',   label: '总榜', icon: '👑', desc: '历史总打卡数' },
+const TABS: { key: RankBy; label: string; icon: string }[] = [
+  { key: 'daily_pomodoro',   label: '日榜', icon: '☀️' },
+  { key: 'weekly_pomodoro',  label: '周榜', icon: '🔥' },
+  { key: 'monthly_pomodoro', label: '月榜', icon: '📅' },
+  { key: 'total_pomodoro',   label: '总榜', icon: '👑' },
 ];
 
 // ── 排名徽章 ───────────────────────────────────
@@ -23,57 +20,20 @@ function RankBadge({ rank }: { rank: number }) {
   if (rank === 2) return <span className="text-3xl">🥈</span>;
   if (rank === 3) return <span className="text-3xl">🥉</span>;
   return (
-    <span className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-400">
+    <span className="w-8 h-8 rounded-full bg-white/10 dark:bg-white/5 flex items-center justify-center text-sm font-bold text-gray-400">
       {rank}
     </span>
   );
 }
 
-// ── 前三名领奖台 ──────────────────────────────
-function Podium({ top3 }: { top3: LeaderboardEntry[] }) {
-  const [first, second, third] = top3;
-  return (
-    <div className="flex items-end justify-center gap-3 h-44 mb-6">
-      {/* 第二名 */}
-      {second && (
-        <div className="flex flex-col items-center w-20">
-          <span className="text-2xl mb-1">{second.avatar_emoji}</span>
-          <span className="text-xs font-medium text-gray-600 dark:text-gray-300 truncate w-full text-center mb-1">
-            {second.display_name}
-          </span>
-          <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-t-xl flex items-center justify-center h-20">
-            <span className="text-2xl">🥈</span>
-          </div>
-        </div>
-      )}
-
-      {/* 第一名 */}
-      {first && (
-        <div className="flex flex-col items-center w-24">
-          <span className="text-3xl mb-1">{first.avatar_emoji}</span>
-          <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate w-full text-center mb-1">
-            {first.display_name}
-          </span>
-          <div className="w-full bg-indigo-500 rounded-t-xl flex items-center justify-center h-28 shadow-lg shadow-indigo-500/30">
-            <span className="text-3xl">🥇</span>
-          </div>
-        </div>
-      )}
-
-      {/* 第三名 */}
-      {third && (
-        <div className="flex flex-col items-center w-20">
-          <span className="text-2xl mb-1">{third.avatar_emoji}</span>
-          <span className="text-xs font-medium text-gray-600 dark:text-gray-300 truncate w-full text-center mb-1">
-            {third.display_name}
-          </span>
-          <div className="w-full bg-amber-100 dark:bg-amber-900/40 rounded-t-xl flex items-center justify-center h-16">
-            <span className="text-2xl">🥉</span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+// ── 排行维度 → 对应打卡数字段 ──────────────────
+function getCheckinField(rankBy: RankBy): keyof LeaderboardEntry {
+  switch (rankBy) {
+    case 'daily_pomodoro':   return 'daily_checkins';
+    case 'weekly_pomodoro':  return 'weekly_checkins';
+    case 'monthly_pomodoro': return 'month_checkins';
+    default:                 return 'total_checkins';
+  }
 }
 
 // ── 排行榜行 ──────────────────────────────────
@@ -88,37 +48,34 @@ function LeaderboardRow({
   rankBy: RankBy;
   isMe: boolean;
 }) {
+  const periodCheckins = entry[getCheckinField(rankBy)] ?? 0;
+  const focusMinutes = entry[rankBy] ?? 0;
+
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors ${
         isMe
-          ? 'bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700'
-          : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+          ? 'bg-indigo-500/20 border border-indigo-400/30'
+          : 'hover:bg-white/5'
       }`}
     >
-      <div className="w-8 text-center"><RankBadge rank={rank} /></div>
-      <span className="text-xl">{entry.avatar_emoji}</span>
+      <div className="w-7 text-center"><RankBadge rank={rank} /></div>
+      {entry.avatar_emoji?.startsWith('http') || entry.avatar_emoji?.startsWith('data:') ? (
+        <img src={entry.avatar_emoji} className="w-8 h-8 rounded-full object-cover" />
+      ) : (
+        <span className="text-xl">{entry.avatar_emoji}</span>
+      )}
       <div className="flex-1 min-w-0">
-        <span className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate block">
+        <span className="text-sm font-medium text-white truncate block">
           {entry.display_name}
-          {isMe && (
-            <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-500">
-              我
-            </span>
-          )}
+          {isMe && <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-500/30 text-indigo-300">我</span>}
         </span>
-        <span className="text-[11px] text-gray-400">
-          {rankBy === 'current_streak'
-            ? `连续 ${entry.current_streak} 天`
-            : `${entry.total_checkins} 次总打卡`}
+        <span className="text-[11px] text-white/40">
+          🍅 专注 {focusMinutes} 分钟 · ✅ 打卡 {periodCheckins} 次
         </span>
       </div>
-      <div className="text-right">
-        <span className="text-lg font-bold text-indigo-500">
-          {rankBy === 'current_streak'
-            ? `${entry.current_streak}天`
-            : entry[rankBy]}
-        </span>
+      <div className="text-right shrink-0">
+        <span className="text-base font-bold text-amber-400">{focusMinutes}<span className="text-xs text-white/40"> 分钟</span></span>
       </div>
     </div>
   );
@@ -127,55 +84,33 @@ function LeaderboardRow({
 // ── 页面主体 ──────────────────────────────────
 export default function LeaderboardPage() {
   const { user } = useAuth();
-  const { state } = useApp();
-  const [rankBy, setRankBy] = useState<RankBy>('weekly_checkins');
+  const [rankBy, setRankBy] = useState<RankBy>('daily_pomodoro');
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [myRank, setMyRank] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [lastSync, setLastSync] = useState<string>('');
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [data, rank] = await Promise.all([
-      fetchLeaderboard(rankBy),
-      fetchMyRank(rankBy),
-    ]);
+    const data = await fetchLeaderboard(rankBy);
     setEntries(data);
-    setMyRank(rank);
     setLoading(false);
   }, [rankBy]);
 
-  // 初次加载 + 切换 Tab 时刷新
+  // 初次加载 + 切换 Tab + 30秒自动刷新
   useEffect(() => {
     load();
+    const timer = setInterval(load, 10000);
+    return () => clearInterval(timer);
   }, [load]);
 
-  // 同步自己的数据
-  useEffect(() => {
-    if (!user) return;
-    const pomodoroTotal = state.checkins.filter((c) =>
-      state.habits.some((h) => h.id === c.habitId && h.usePomodoro)
-    ).length;
-    syncToLeaderboard(state.habits, state.checkins, pomodoroTotal).then(() => {
-      setLastSync(new Date().toLocaleTimeString());
-    });
-  }, [user, state.checkins.length]); // 仅在打卡数变化时同步
-
-  const top3 = entries.slice(0, 3);
-  const rest = entries.slice(3);
-  const myEntry = entries.find((e) => e.user_id === user?.id);
 
   return (
     <div className="min-h-dvh relative">
       <ImageCarousel images={['/bg-leaderboard.jpg', '/leaderboard-2.jpg']} interval={6000} />
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">排行榜</h1>
-        {lastSync && (
-          <span className="text-[10px] text-gray-400">已同步 {lastSync}</span>
-        )}
+        <h1 className="text-2xl font-bold text-white drop-shadow-lg">排行榜</h1>
       </div>
-      <p className="text-gray-400 dark:text-gray-500 mb-1">和全站用户比比谁更自律</p>
+      <p className="text-white/80 drop-shadow mb-1">和全站用户比比谁更自律</p>
 
       {/* 未登录提示 */}
       {!user && (
@@ -187,7 +122,7 @@ export default function LeaderboardPage() {
       )}
 
       {/* Tab 切换 */}
-      <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-4 overflow-x-auto">
+      <div className="flex bg-white/10 dark:bg-white/5 rounded-xl p-1 mb-4 overflow-x-auto">
         {TABS.map((tab) => (
           <button
             key={tab.key}
@@ -218,44 +153,20 @@ export default function LeaderboardPage() {
         </div>
       ) : (
         <>
-          {/* 前三名领奖台 */}
-          <Podium top3={top3} />
-
           {/* 我的排名条 */}
-          {user && myRank && myRank > 3 && (
-            <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3">
-              <span className="text-sm text-indigo-500 font-bold">我的排名</span>
-              <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">#{myRank}</span>
-              <span className="text-xs text-indigo-400 ml-auto">
-                {rankBy === 'current_streak'
-                  ? `连续 ${myEntry?.current_streak ?? 0} 天`
-                  : `${myEntry?.[rankBy] ?? 0} 次`}
-              </span>
-            </div>
-          )}
 
-          {/* 4-50 名列表 */}
-          {rest.length > 0 && (
-            <div className="space-y-1">
-              <p className="text-xs text-gray-400 px-4 mb-2">完整排名</p>
-              {rest.map((entry, i) => (
-                <LeaderboardRow
-                  key={entry.user_id}
-                  entry={entry}
-                  rank={i + 4}
-                  rankBy={rankBy}
-                  isMe={entry.user_id === user?.id}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* 如果我在前三但不显示在列表 */}
-          {myEntry && myRank && myRank <= 3 && rest.length === 0 && (
-            <div className="text-center text-sm text-gray-400 py-8">
-              🎉 你在领奖台上！继续加油保持排名！
-            </div>
-          )}
+          {/* 全部排行 */}
+          <div className="space-y-1">
+            {entries.map((entry, i) => (
+              <LeaderboardRow
+                key={entry.user_id}
+                entry={entry}
+                rank={i + 1}
+                rankBy={rankBy}
+                isMe={entry.user_id === user?.id}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>

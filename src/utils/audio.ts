@@ -86,7 +86,7 @@ function playBuiltinFile(src: string) {
 }
 
 // ── Public API ──
-export type SoundscapeType = 'fire' | 'ocean' | 'canon' | 'mariage' | 'fivehundred' | 'fate' | 'rain2' | 'slot0' | 'slot1' | 'slot2' | 'none';
+export type SoundscapeType = 'fire' | 'ocean' | 'canon' | 'mariage' | 'fivehundred' | 'fate' | 'rain2' | 'hometown' | 'pipa' | 'slot0' | 'slot1' | 'slot2' | 'slot3' | 'slot4' | 'slot5' | 'slot6' | 'slot7' | 'none';
 
 export function getPlayingState(): boolean { return isPlaying; }
 export function getSoundscapeType(): SoundscapeType { return currentType; }
@@ -106,7 +106,7 @@ export function playTrack(id: string, name: string, blob: Blob): void {
   playBlob(name, blob);
   isPlaying = true;
   // Map slot id to type
-  const map: Record<string, SoundscapeType> = { '0': 'slot0', '1': 'slot1', '2': 'slot2' };
+  const map: Record<string, SoundscapeType> = { '0':'slot0','1':'slot1','2':'slot2','3':'slot3','4':'slot4','5':'slot5','6':'slot6','7':'slot7' };
   currentType = map[id] || 'none';
   currentFileName = name;
 }
@@ -135,6 +135,10 @@ export function startSoundscape(type: SoundscapeType): void {
     playBuiltinFile('/fate.mp3');
   } else if (type === 'rain2') {
     playBuiltinFile('/rain2.mp3');
+  } else if (type === 'hometown') {
+    playBuiltinFile('/hometown.mp3');
+  } else if (type === 'pipa') {
+    playBuiltinFile('/pipa.mp3');
   }
 }
 
@@ -161,6 +165,23 @@ export function playWorkCompleteSound(): void {
     g.gain.exponentialRampToValueAtTime(0.01, c.currentTime + i * 0.15 + 0.4);
     o.connect(g); g.connect(c.destination);
     o.start(c.currentTime + i * 0.15); o.stop(c.currentTime + i * 0.15 + 0.5);
+  });
+}
+
+export function playDingSound(): void {
+  const c = getCtx(); if (c.state === 'suspended') c.resume();
+  const t = c.currentTime;
+  // 下课铃——叮叮叮叮，渐快
+  const notes = [1200, 1400, 1200, 1400, 1600, 1400, 1200, 1400, 1600, 1800];
+  notes.forEach((f, i) => {
+    const delay = i < 4 ? i * 0.25 : (i - 4) * 0.18 + 1.0; // 前4声慢，后6声快
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'triangle'; // 三角波更像铃声
+    o.frequency.value = f;
+    g.gain.setValueAtTime(0.35, t + delay);
+    g.gain.exponentialRampToValueAtTime(0.01, t + delay + 0.2);
+    o.connect(g); g.connect(c.destination);
+    o.start(t + delay); o.stop(t + delay + 0.25);
   });
 }
 

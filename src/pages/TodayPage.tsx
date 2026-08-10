@@ -37,14 +37,14 @@ export default function TodayPage() {
 
   return (
     <div className="min-h-dvh relative" style={{
-        background: 'url(/bg-checkin.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh',
+        background: 'url(/bg-checkin.jpg) center/cover no-repeat', backgroundAttachment: 'fixed', minHeight: '100dvh', filter: 'saturate(1.08) brightness(1.04) contrast(1.05)',
       }}>
 <div className="max-w-lg mx-auto px-4 pt-4 sm:pt-6 pb-4 relative z-10">
       <div className="mb-2">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
           {isToday ? '今日打卡' : '打卡记录'}
         </h1>
-        <p className="text-gray-400 dark:text-gray-500 mt-1">{formatDate(selectedDate)}</p>
+        <p className="text-white/80 drop-shadow mt-1">{formatDate(selectedDate)}</p>
       </div>
 
       <DateSlider selectedDate={selectedDate} onChange={setSelectedDate} />

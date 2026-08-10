@@ -41,10 +41,10 @@ export default function MonthlyHeatmap({ checkins, habitId, year, month }: Props
 
   function colorClass(count: number): string {
     if (count < 0) return 'invisible';
-    if (count === 0) return 'bg-gray-100 dark:bg-gray-700';
+    if (count === 0) return 'bg-white/10 dark:bg-white/5';
     const level = Math.ceil((count / maxCount) * 4);
     const colors = [
-      'bg-gray-100 dark:bg-gray-700',
+      'bg-white/10 dark:bg-white/5',
       'bg-emerald-200 dark:bg-emerald-900',
       'bg-emerald-300 dark:bg-emerald-700',
       'bg-emerald-400 dark:bg-emerald-500',

@@ -30,14 +30,14 @@ export default function YearlyChart({ checkins, habitId, year, onYearChange }: P
         <div className="flex items-center gap-2">
           <button
             onClick={() => onYearChange(year - 1)}
-            className="text-sm px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="text-sm px-2 py-1 rounded-lg hover:bg-white/15 dark:hover:bg-white/10"
           >
             ←
           </button>
           <span className="text-sm font-medium">{year}</span>
           <button
             onClick={() => onYearChange(year + 1)}
-            className="text-sm px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="text-sm px-2 py-1 rounded-lg hover:bg-white/15 dark:hover:bg-white/10"
           >
             →
           </button>

@@ -39,25 +39,25 @@ export default function PomodoroOverlay() {
     setIsRunning(true);
     hasAlerted.current = false;
 
+    const leftRef = { current: remaining };
     intervalRef.current = window.setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          setIsRunning(false);
-          if (intervalRef.current) clearInterval(intervalRef.current);
-
-          if (!hasAlerted.current) {
-            hasAlerted.current = true;
-            if (activePomodoro.isBreak) {
-              playBreakEndSound();
-            } else {
-              playWorkCompleteSound();
-              startBreak();
-            }
+      const next = leftRef.current - 1;
+      leftRef.current = next;
+      setTimeLeft(Math.max(0, next));
+      if (next <= 0) {
+        setIsRunning(false);
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        // 副作用在 updater 外（updater 会被 React 重复调用，必须保持纯函数）
+        if (!hasAlerted.current) {
+          hasAlerted.current = true;
+          if (activePomodoro.isBreak) {
+            playBreakEndSound();
+          } else {
+            playWorkCompleteSound();
+            startBreak();
           }
-          return 0;
         }
-        return prev - 1;
-      });
+      }
     }, 1000);
 
     return () => {

@@ -35,7 +35,7 @@ export default function EmojiPicker({ value, onChange }: Props) {
             className={`text-xl p-2 rounded-lg transition-all ${
               value === e
                 ? 'bg-indigo-100 dark:bg-indigo-900 ring-2 ring-indigo-500 scale-110'
-                : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                : 'hover:bg-white/15 dark:hover:bg-white/10'
             }`}
           >
             {e}

@@ -11,13 +11,13 @@ export default function ConfirmDialog({ open, title, message, onConfirm, onCance
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onCancel}>
-      <div className="bg-white/15 dark:bg-black/20 rounded-xl p-6 mx-4 max-w-sm w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-semibold mb-2">{title}</h3>
-        <p className="text-gray-500 dark:text-gray-400 mb-6">{message}</p>
+      <div className="bg-white/15 dark:bg-black/20 backdrop-blur-xl rounded-2xl p-6 mx-4 max-w-sm w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+        <p className="text-white/70 text-sm mb-6">{message}</p>
         <div className="flex gap-3 justify-end">
           <button
             onClick={onCancel}
-            className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="px-4 py-2 rounded-lg bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/15 text-white transition-colors"
           >
             取消
           </button>

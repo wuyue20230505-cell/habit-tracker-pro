@@ -39,7 +39,7 @@ export default function HabitBreakdown({ habits, checkins }: Props) {
         {data.map(({ habit, total, currentStreak, longestStreak, weekCheckins }) => (
           <div
             key={habit.id}
-            className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50"
+            className="flex items-center gap-3 p-3 rounded-xl bg-white/10 dark:bg-white/5"
           >
             <span className="text-xl">{habit.emoji}</span>
             <div className="flex-1 min-w-0">

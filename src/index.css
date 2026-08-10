@@ -8,5 +8,18 @@ body {
 }
 
 #root {
+  min-height: 100vh;
   min-height: 100dvh;
+}
+
+/* 老 WebView (Android 7/8) 不支持 dvh 单位，回退到 vh */
+@supports not (height: 100dvh) {
+  .min-h-dvh { min-height: 100vh; }
+  .h-dvh { height: 100vh; }
+  .max-h-dvh { max-height: 100vh; }
+}
+
+/* 触屏设备：background-attachment:fixed 在移动 WebView 渲染异常/闪烁，降级为 scroll */
+@media (hover: none) {
+  * { background-attachment: scroll !important; }
 }

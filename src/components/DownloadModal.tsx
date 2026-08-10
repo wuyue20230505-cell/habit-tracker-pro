@@ -3,11 +3,11 @@ interface Props {
   onClose: () => void;
 }
 
+const PGYER_URL = 'https://www.pgyer.com/xgzz';
+const QR_URL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(PGYER_URL)}`;
+
 export default function DownloadModal({ open, onClose }: Props) {
   if (!open) return null;
-
-  const productionUrl = 'https://my-project-rust-six-71.vercel.app';
-  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(productionUrl)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
@@ -15,49 +15,42 @@ export default function DownloadModal({ open, onClose }: Props) {
         className="bg-white/15 dark:bg-black/20 backdrop-blur-md rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">📱 安装到手机</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">三种方式，任选其一</p>
+        <h2 className="text-xl font-bold text-white mb-2 drop-shadow">📱 安装到手机</h2>
+        <p className="text-sm text-white/60 mb-4">扫码或点击链接即可安装</p>
 
-        {/* Method 1: PWA - best option */}
-        <div className="bg-indigo-50 dark:bg-indigo-900/20 border-2 border-indigo-300 dark:border-indigo-700 rounded-2xl p-4 mb-4 text-left">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">⭐</span>
-            <h3 className="font-bold text-indigo-700 dark:text-indigo-400">推荐：一键安装（无需下载）</h3>
+        {/* 蒲公英 — 微信扫码安装 */}
+        <div className="bg-emerald-50/20 border-2 border-emerald-300/30 rounded-2xl p-4 mb-4">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className="text-lg">📱</span>
+            <h3 className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">微信扫码安装</h3>
           </div>
-          <ol className="text-sm text-indigo-600 dark:text-indigo-400 space-y-1.5 leading-relaxed">
-            <li>1. 手机浏览器打开 <span className="font-mono text-xs bg-indigo-100 dark:bg-indigo-900/40 px-1 rounded">my-project-rust-six-71.vercel.app</span></li>
-            <li>2. 点击浏览器菜单 <strong>⋮</strong> → <strong>添加到主屏幕</strong></li>
-            <li>3. 桌面出现「习惯追踪」图标，像原生APP一样使用！</li>
-          </ol>
+          <div className="bg-white rounded-xl p-2 mb-3 inline-block">
+            <img src={QR_URL} alt="下载二维码" className="w-40 h-40" />
+          </div>
+          <p className="text-xs text-emerald-600 dark:text-emerald-400">微信扫码 → 右上角浏览器打开 → 一键安装</p>
         </div>
 
-        {/* Method 2: QR Code */}
-        <div className="bg-white/20 dark:bg-black/30 rounded-2xl p-4 mb-4 border dark:border-gray-600">
-          <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">📷 扫码打开</h3>
-          <div className="bg-white/20 rounded-xl p-2 mb-2 inline-block">
-            <img src={qrApiUrl} alt="QR Code" className="w-36 h-36" />
-          </div>
-          <p className="text-xs text-gray-400">微信/浏览器扫码即可打开</p>
-        </div>
+        {/* 直接下载链接 */}
+        <a
+          href={PGYER_URL}
+          target="_blank"
+          rel="noopener"
+          className="block w-full py-3 rounded-xl bg-indigo-500 text-white font-bold text-sm text-center hover:bg-indigo-600 transition-colors mb-2"
+        >
+          📥 直接下载安装
+        </a>
+        <p className="text-[10px] text-white/30 mb-4">如提示"未知来源"，请前往设置 → 安全 → 允许安装未知应用</p>
 
-        {/* Method 3: APK direct download */}
-        <div className="bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-800 rounded-2xl p-4 text-left">
-          <h3 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-2">📦 安卓 APK 一键下载</h3>
-          <a
-            href="/habit-tracker.apk"
-            download
-            className="block w-full py-3 rounded-xl bg-emerald-500 text-white font-bold text-sm text-center hover:bg-emerald-600 transition-colors mb-2"
-          >
-            📥 下载 APK (4.3 MB)
-          </a>
-          <p className="text-xs text-emerald-600 dark:text-emerald-400 leading-relaxed">
-            下载后直接安装即可。如提示「未知来源」，请前往设置 → 安全 → 允许安装未知应用。
+        {/* 网页版 */}
+        <div className="bg-white/10 rounded-2xl p-3 mb-4">
+          <p className="text-xs text-white/50">
+            💡 也可以用浏览器打开 <span className="text-white/70 font-mono text-[10px]">my-project-rust-six-71.vercel.app</span> 直接使用网页版
           </p>
         </div>
 
         <button
           onClick={onClose}
-          className="mt-5 w-full py-3 rounded-2xl bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm"
+          className="w-full py-3 rounded-2xl bg-white/10 text-white/60 font-medium hover:bg-white/15 transition-colors text-sm"
         >
           关闭
         </button>

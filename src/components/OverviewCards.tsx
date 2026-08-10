@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
-import type { Checkin, Habit } from '../types';
+import type { Checkin, Habit, PomodoroRecord } from '../types';
 import { today } from '../utils/date';
 
 interface Props {
   habits: Habit[];
   checkins: Checkin[];
+  pomodoroRecords?: PomodoroRecord[];
   habitId?: string;
 }
 
@@ -34,7 +35,7 @@ function calcLongestDateStreak(dates: Set<string>): number {
   return longest;
 }
 
-export default function OverviewCards({ habits, checkins, habitId }: Props) {
+export default function OverviewCards({ habits, checkins, pomodoroRecords, habitId }: Props) {
   const stats = useMemo(() => {
     const filtered = habitId ? checkins.filter((c) => c.habitId === habitId) : checkins;
     const filteredHabits = habitId
@@ -62,8 +63,29 @@ export default function OverviewCards({ habits, checkins, habitId }: Props) {
     return { total, bestStreak, currentStreak, habitCount: filteredHabits.length };
   }, [habits, checkins, habitId]);
 
+  const todayStr = today();
+  const thisMonth = todayStr.slice(0, 7);
+  const records = pomodoroRecords || [];
+  // 本周一
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const monday = new Date(now); monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  const mondayStr = monday.toISOString().slice(0, 10);
+
+  const todayPomodoros = records.filter(r => r.date === todayStr);
+  const weekPomodoros = records.filter(r => r.date >= mondayStr);
+  const monthPomodoros = records.filter(r => r.date.startsWith(thisMonth));
+  const totalFocusMin = records.reduce((s, r) => s + r.minutes, 0);
+  const todayFocusMin = todayPomodoros.reduce((s, r) => s + r.minutes, 0);
+  const weekFocusMin = weekPomodoros.reduce((s, r) => s + r.minutes, 0);
+  const monthFocusMin = monthPomodoros.reduce((s, r) => s + r.minutes, 0);
+
   const cards = [
     { label: '总打卡', value: stats.total, icon: '✅', unit: '次' },
+    { label: '今日专注', value: todayFocusMin, icon: '🍅', unit: '分钟' },
+    { label: '本周专注', value: weekFocusMin, icon: '📆', unit: '分钟' },
+    { label: '本月专注', value: monthFocusMin, icon: '📅', unit: '分钟' },
+    { label: '总专注', value: totalFocusMin, icon: '⏱️', unit: '分钟' },
     { label: '当前连续', value: stats.currentStreak, icon: '🔥', unit: '天' },
     { label: '最长连续', value: stats.bestStreak, icon: '🏆', unit: '天' },
     { label: '活跃习惯', value: stats.habitCount, icon: '📋', unit: '个' },

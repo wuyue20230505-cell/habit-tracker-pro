@@ -3,65 +3,85 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
   stopSoundscape,
-  playWorkCompleteSound,
-  playBreakEndSound,
+  setVolume,
+  startSoundscape,
+  playDingSound,
 } from '../utils/audio';
 import MusicPicker from '../components/MusicPicker';
 
 export default function PomodoroTimerPage() {
-  const { state, addCheckin, stopPomodoro, startBreak, incrementCycle } = useApp();
+  const { state, stopPomodoro, startBreak, addCheckin, addPomodoroRecord } = useApp();
   const navigate = useNavigate();
   const { activePomodoro } = state;
 
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const [pausedTime, setPausedTime] = useState(0);
   const intervalRef = useRef<number | null>(null);
-  const hasAlerted = useRef(false);
+  const pomoRef = useRef(activePomodoro);
+  pomoRef.current = activePomodoro;
+  // 剩余秒数用 ref 追踪：副作用（打卡/记录/切休息）必须放在 setState updater 之外，
+  // 否则 React（StrictMode/并发重渲染）会重复执行 updater 导致记录双倍
+  const timeLeftRef = useRef(0);
 
   useEffect(() => {
     if (!activePomodoro) navigate('/checkin', { replace: true });
   }, [activePomodoro, navigate]);
 
   useEffect(() => {
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, []);
-
-  useEffect(() => {
     if (!activePomodoro) return;
+    if (isPaused) return;
+
     const phaseDuration = activePomodoro.isBreak
       ? activePomodoro.breakMinutes * 60
       : activePomodoro.workMinutes * 60;
-    const elapsed = Math.floor((Date.now() - activePomodoro.phaseStartedAt) / 1000);
-    setTimeLeft(Math.max(0, phaseDuration - elapsed));
+    // 暂停恢复用冻结时间
+    const remaining = pausedTime > 0 ? pausedTime
+      : Math.max(0, phaseDuration - Math.floor((Date.now() - activePomodoro.phaseStartedAt) / 1000));
+    timeLeftRef.current = remaining;
+    setTimeLeft(remaining);
+    if (pausedTime > 0) setPausedTime(0);
     setIsRunning(true);
-    hasAlerted.current = false;
 
-    intervalRef.current = window.setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          setIsRunning(false);
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          if (!hasAlerted.current) {
-            hasAlerted.current = true;
-            if (activePomodoro.isBreak) { playBreakEndSound(); }
-            else { playWorkCompleteSound(); startBreak(); }
-          }
-          return 0;
+    const id = window.setInterval(() => {
+      const next = timeLeftRef.current - 1;
+      timeLeftRef.current = next;
+      setTimeLeft(Math.max(0, next));
+      if (next <= 0) {
+        clearInterval(id);
+        setIsRunning(false);
+        // 副作用在 updater 外，只执行一次
+        const p = pomoRef.current;
+        if (!p) return;
+        if (!p.isBreak) {
+          addCheckin(p.habitId);
+          addPomodoroRecord(p.workMinutes);
+          playDingSound();
+          startBreak();
+          startSoundscape('mariage');
+        } else {
+          // 休息结束 → 停音乐
+          stopSoundscape();
         }
-        return prev - 1;
-      });
+      }
     }, 1000);
+    intervalRef.current = id;
+    return () => clearInterval(id);
+  }, [activePomodoro?.phaseStartedAt, activePomodoro?.isBreak, isPaused]);
 
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [activePomodoro?.phaseStartedAt, activePomodoro?.isBreak]);
-
-  const handleContinue = () => { incrementCycle(); };
-  const handleFinish = () => {
-    navigate('/checkin', { replace: true });
-    addCheckin(activePomodoro!.habitId);
-    stopPomodoro();
-    stopSoundscape();
+  const handlePause = () => {
+    if (isPaused) {
+      setTimeLeft(pausedTime);
+      setIsPaused(false);
+      setVolume(0.4);
+    } else {
+      setPausedTime(timeLeft);
+      setIsPaused(true);
+      setVolume(0);
+    }
   };
+
   const handleCancel = () => {
     navigate('/checkin', { replace: true });
     stopPomodoro();
@@ -94,7 +114,7 @@ export default function PomodoroTimerPage() {
           <span className="text-4xl">{activePomodoro.habitEmoji}</span>
           <h1 className="text-xl font-bold text-white mt-2 drop-shadow-lg">{activePomodoro.habitName}</h1>
           <p className="text-white/70 text-sm mt-1 drop-shadow">
-            {activePomodoro.isBreak ? '☕ 休息时间' : `🍅 工作时间 · 第 ${activePomodoro.totalCycles + 1} 轮`}
+            {activePomodoro.isBreak ? '☕ 休息时间' : '🍅 专注时间'}
           </p>
         </div>
 
@@ -118,30 +138,35 @@ export default function PomodoroTimerPage() {
           </div>
         </div>
 
-        {/* 按钮：计时中显示结束 */}
-        {isRunning && (
-          <button onClick={handleCancel}
-            className="relative z-10 py-2.5 px-8 rounded-2xl bg-white/15 backdrop-blur-md text-white font-medium text-sm border border-white/20 hover:bg-white/25 transition-all"
-          >
-            结束计时
-          </button>
-        )}
-
-        {/* 休息结束：继续或完成 */}
-        {!isRunning && activePomodoro.isBreak && (
-          <div className="flex flex-col gap-3 w-full max-w-xs relative z-10">
-            <button onClick={handleContinue}
-              className="py-3 rounded-2xl bg-indigo-500/90 text-white font-semibold hover:bg-indigo-600 transition-all"
+        {/* 按钮：暂停/继续切换 + 结束 */}
+        {!(!isRunning && !isPaused && activePomodoro.isBreak) && (
+          <div className="flex gap-3 relative z-10">
+            <button onClick={handlePause}
+              className={`py-2.5 px-6 rounded-2xl text-white font-medium text-sm transition-all ${
+                isPaused ? 'bg-indigo-500/80 hover:bg-indigo-500' : 'bg-amber-500/80 hover:bg-amber-500'
+              }`}
             >
-              🍅 继续番茄钟
+              {isPaused ? '▶ 继续' : '⏸ 暂停'}
             </button>
-            <button onClick={handleFinish}
-              className="py-3 rounded-2xl bg-emerald-500/90 text-white font-semibold hover:bg-emerald-600 transition-all"
+            <button onClick={handleCancel}
+              className="py-2.5 px-6 rounded-2xl bg-white/15 backdrop-blur-md text-white font-medium text-sm border border-white/20 hover:bg-white/25 transition-all"
             >
-              ✅ 结束打卡（已完成 {activePomodoro.totalCycles + 1} 轮）
+              结束
             </button>
           </div>
         )}
+
+        {/* 休息结束：停留在页面 */}
+        {!isRunning && !isPaused && activePomodoro.isBreak && (
+          <div className="flex flex-col gap-3 relative z-10">
+            <p className="text-white/60 text-sm drop-shadow text-center">✅ 专注完成</p>
+            <button onClick={handleCancel}
+              className="py-2.5 px-8 rounded-2xl bg-white/15 backdrop-blur-md text-white font-medium text-sm border border-white/20 hover:bg-white/25 transition-all">
+              返回打卡页
+            </button>
+          </div>
+        )}
+
 
         {/* 音乐 */}
         <div className="mt-6 w-full max-w-sm relative z-10">

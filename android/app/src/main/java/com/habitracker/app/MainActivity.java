@@ -1,4 +1,4 @@
-package com.habit.tracker;
+package com.habitracker.app;
 
 import com.getcapacitor.BridgeActivity;
 

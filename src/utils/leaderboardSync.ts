@@ -59,7 +59,12 @@ function calcLongestStreak(checkins: Checkin[], habitId?: string): number {
   return longest;
 }
 
-// ── 本周 / 本月打卡数 ──────────────────────────────
+// ── 今日 / 本周 / 本月打卡数 ──────────────────────
+function thisDayCount(checkins: Checkin[]): number {
+  const today = new Date().toISOString().slice(0, 10);
+  return checkins.filter(c => c.date === today).length;
+}
+
 function thisWeekCount(checkins: Checkin[]): number {
   const now = new Date();
   const day = now.getDay();
@@ -74,32 +79,11 @@ function thisMonthCount(checkins: Checkin[]): number {
   return checkins.filter((c) => c.date.startsWith(prefix)).length;
 }
 
-// ── 重置周/月计数器（跨周期时调用） ───────────
-function shouldResetWeekly(lastDate: string | null): boolean {
-  if (!lastDate) return false;
-  const now = new Date();
-  const last = new Date(lastDate + 'T00:00:00');
-  const nowMonday = new Date(now);
-  const day = now.getDay();
-  nowMonday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-  const lastMonday = new Date(last);
-  const lastDay = last.getDay();
-  lastMonday.setDate(last.getDate() - (lastDay === 0 ? 6 : lastDay - 1));
-  return nowMonday.toISOString().slice(0, 10) !== lastMonday.toISOString().slice(0, 10);
-}
-
-function shouldResetMonthly(lastDate: string | null): boolean {
-  if (!lastDate) return false;
-  const now = new Date().toISOString().slice(0, 7);
-  const last = (lastDate || '').slice(0, 7);
-  return now !== last;
-}
-
 // ── 主入口：同步当前用户数据到排行榜 ──────────
 export async function syncToLeaderboard(
   habits: Habit[],
   checkins: Checkin[],
-  totalPomodoro: number,
+  pomodoroRecords: { date: string; minutes: number }[],
   displayName?: string,
 ) {
   if (!supabase) return; // Supabase 未配置
@@ -117,23 +101,35 @@ export async function syncToLeaderboard(
     .maybeSingle();
 
   const prevLongest = existing.data?.longest_streak ?? 0;
-  const resetWeekly = shouldResetWeekly(existing.data?.last_checkin_date ?? null);
-  const resetMonthly = shouldResetMonthly(existing.data?.last_checkin_date ?? null);
 
   const newStreak = calcStreak(checkins);
   const newLongest = Math.max(prevLongest, calcLongestStreak(checkins));
 
+  // 专注时长统计
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const weekStart = (() => { const d=new Date(); d.setDate(d.getDate()-(d.getDay()||7)+1); return d.toISOString().slice(0,10); })();
+  const monthStart = new Date().toISOString().slice(0, 7);
+  const totalPomodoro = pomodoroRecords.reduce((s,r)=>s+r.minutes,0);
+  const dailyPomodoro = pomodoroRecords.filter(r=>r.date===todayStr).reduce((s,r)=>s+r.minutes,0);
+  const weeklyPomodoro = pomodoroRecords.filter(r=>r.date>=weekStart).reduce((s,r)=>s+r.minutes,0);
+  const monthlyPomodoro = pomodoroRecords.filter(r=>r.date.startsWith(monthStart)).reduce((s,r)=>s+r.minutes,0);
+
+  const md = user.user_metadata || {};
   const payload = {
     user_id: user.id,
-    display_name: displayName || user.email?.split('@')[0] || '匿名用户',
-    avatar_emoji: '🏃',
+    display_name: displayName || md?.username || user.email?.split('@')[0] || '匿名用户',
+    avatar_emoji: md?.avatar || '🏃',
     total_checkins: checkins.length,
+    daily_checkins: thisDayCount(checkins),
     current_streak: newStreak,
     longest_streak: newLongest,
-    weekly_checkins: resetWeekly ? thisWeekCount(checkins) : thisWeekCount(checkins),
-    month_checkins: resetMonthly ? thisMonthCount(checkins) : thisMonthCount(checkins),
+    weekly_checkins: thisWeekCount(checkins),
+    month_checkins: thisMonthCount(checkins),
     habit_count: habits.filter((h) => !h.archived).length,
     total_pomodoro: totalPomodoro,
+    daily_pomodoro: dailyPomodoro,
+    weekly_pomodoro: weeklyPomodoro,
+    monthly_pomodoro: monthlyPomodoro,
     last_checkin_date: lastDate,
     updated_at: new Date().toISOString(),
   };
@@ -159,24 +155,55 @@ export type LeaderboardEntry = {
   longest_streak: number;
   weekly_checkins: number;
   month_checkins: number;
+  daily_checkins: number;
   habit_count: number;
   total_pomodoro: number;
+  weekly_pomodoro: number;
+  monthly_pomodoro: number;
+  daily_pomodoro: number;
   last_checkin_date: string | null;
   updated_at: string;
 };
 
-export type RankBy = 'total_checkins' | 'weekly_checkins' | 'month_checkins' | 'current_streak';
+export type RankBy = 'daily_pomodoro' | 'weekly_pomodoro' | 'monthly_pomodoro' | 'total_pomodoro';
+
+// ── 时间过滤辅助 ──────────────────────────────
+function getPeriodStart(rankBy: RankBy): string | null {
+  const now = new Date();
+  switch (rankBy) {
+    case 'daily_pomodoro':   // 今日 0 点
+      return now.toISOString().slice(0, 10);
+    case 'weekly_pomodoro': { // 本周一
+      const day = now.getDay();
+      const mon = new Date(now);
+      mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+      return mon.toISOString().slice(0, 10);
+    }
+    case 'monthly_pomodoro': // 本月 1 号
+      return now.toISOString().slice(0, 7) + '-01';
+    default:                 // total — 永不重置
+      return null;
+  }
+}
 
 export async function fetchLeaderboard(
-  rankBy: RankBy = 'weekly_checkins',
+  rankBy: RankBy = 'daily_pomodoro',
   limit = 50,
 ): Promise<LeaderboardEntry[]> {
   if (!supabase) return [];
-  const { data, error } = await supabase
-    .from('leaderboard')
-    .select('*')
-    .order(rankBy, { ascending: false })
-    .limit(limit);
+
+  let query = supabase.from('leaderboard').select('*');
+
+  // 日榜 / 周榜 / 月榜：只显示当前周期内同步过的用户
+  const periodStart = getPeriodStart(rankBy);
+  if (periodStart) {
+    query = query.gte('updated_at', periodStart);
+  }
+  // 总榜：不过滤，永不重置
+
+  query = query.order(rankBy, { ascending: false }).limit(limit);
+
+  const { data, error } = await query;
 
   if (error) {
     console.warn('[leaderboard] fetch failed:', error.message);
@@ -191,11 +218,18 @@ export async function fetchMyRank(rankBy: RankBy): Promise<number | null> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: all } = await supabase
-    .from('leaderboard')
-    .select('user_id')
-    .order(rankBy, { ascending: false });
+  let query = supabase.from('leaderboard').select('user_id');
 
+  // 日榜 / 周榜 / 月榜：只用当前周期内的数据
+  const periodStart = getPeriodStart(rankBy);
+  if (periodStart) {
+    query = query.gte('updated_at', periodStart);
+  }
+  // 总榜：不过滤
+
+  query = query.order(rankBy, { ascending: false });
+
+  const { data: all } = await query;
   if (!all) return null;
   const idx = all.findIndex((r) => r.user_id === user.id);
   return idx === -1 ? null : idx + 1;

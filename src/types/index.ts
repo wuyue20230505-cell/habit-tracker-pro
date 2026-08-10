@@ -8,6 +8,7 @@ export interface Habit {
   archived: boolean;
   usePomodoro?: boolean;
   pomodoroMinutes?: number;
+  breakMinutes?: number;
   dailyGoal?: number;
   excludeHolidays?: boolean;
 }
@@ -36,10 +37,18 @@ export interface ActivePomodoro {
   phaseStartedAt: number;
 }
 
+export interface PomodoroRecord {
+  id: string;
+  date: string;
+  minutes: number;
+  habitId?: string;
+}
+
 export type AppState = {
   habits: Habit[];
   checkins: Checkin[];
   activePomodoro: ActivePomodoro | null;
+  pomodoroRecords: PomodoroRecord[];
 };
 
 export type AppAction =
@@ -52,4 +61,6 @@ export type AppAction =
   | { type: 'START_POMODORO'; payload: ActivePomodoro }
   | { type: 'STOP_POMODORO' }
   | { type: 'START_BREAK' }
-  | { type: 'INCREMENT_CYCLE' };
+  | { type: 'INCREMENT_CYCLE' }
+  | { type: 'ADD_POMODORO_RECORD'; payload: PomodoroRecord }
+  | { type: 'CLOUD_SYNC'; payload: { habits: Habit[]; checkins: Checkin[]; records: PomodoroRecord[] } };

@@ -8,10 +8,10 @@ export const LIMITS = {
   FREE_MUSIC: ['rain'],  // 免费只有雨声
 } as const;
 
-// ── 定价方案 ──────────────────────────────────
+// ── 定价方案（限时折扣）──────────────────────
 export const PRICING = {
-  yearly:  { price: 12,  period: '年', label: '年付' },
-  lifetime:{ price: 48,  period: '',  label: '终身买断' },
+  yearly:  { price: 9,  originalPrice: 12,  period: '年', label: '年付' },
+  lifetime:{ price: 18, originalPrice: 48,  period: '',  label: '终身买断' },
 } as const;
 
 // ── 面包多 支付配置 ───────────────────────────

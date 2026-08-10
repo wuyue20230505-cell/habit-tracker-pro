@@ -70,10 +70,10 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40" onClick={onClose}>
       <div
-        className="bg-white/15 dark:bg-black/20 rounded-t-2xl sm:rounded-2xl p-6 w-full sm:max-w-md max-h-[85vh] overflow-y-auto shadow-xl"
+        className="bg-white/15 dark:bg-black/20 backdrop-blur-xl rounded-t-2xl sm:rounded-2xl p-6 w-full sm:max-w-md max-h-[85vh] overflow-y-auto shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold mb-6">{habit ? '编辑习惯' : '新建习惯'}</h2>
+        <h2 className="text-xl font-bold text-white mb-6">{habit ? '编辑习惯' : '新建习惯'}</h2>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">名称</label>
@@ -81,7 +81,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="例如：每天喝8杯水"
-              className="w-full px-4 py-2.5 rounded-xl border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2.5 rounded-xl border dark:border-gray-600 bg-white/10 dark:bg-black/20 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
               autoFocus
             />
           </div>
@@ -113,7 +113,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
               <button
                 type="button"
                 onClick={() => setDailyGoal((p) => Math.max(1, p - 1))}
-                className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="w-8 h-8 rounded-lg bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/15"
               >
                 -
               </button>
@@ -121,14 +121,14 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
                 type="number"
                 value={dailyGoal}
                 onChange={(e) => setDailyGoal(Math.max(1, Math.min(99, Number(e.target.value))))}
-                className="w-16 text-center py-1.5 rounded-lg border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm"
+                className="w-16 text-center py-1.5 rounded-lg border dark:border-gray-600 bg-white/10 dark:bg-black/20 text-sm appearance-none"
                 min={1}
                 max={99}
               />
               <button
                 type="button"
                 onClick={() => setDailyGoal((p) => Math.min(99, p + 1))}
-                className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="w-8 h-8 rounded-lg bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/15"
               >
                 +
               </button>
@@ -137,7 +137,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
           </div>
 
           {/* Pomodoro toggle */}
-          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+          <div className="bg-white/10 dark:bg-white/5 rounded-xl p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="flex-1">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">🍅 番茄钟模式</span>
@@ -151,7 +151,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-all ${
+                  className={`absolute top-0.5 w-6 h-6 rounded-full bg-white/10 shadow transition-all ${
                     usePomodoro ? 'left-5' : 'left-0.5'
                   }`}
                 />
@@ -172,7 +172,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
                   type="number"
                   value={pomodoroMinutes}
                   onChange={(e) => setPomodoroMinutes(Math.max(5, Math.min(120, Number(e.target.value))))}
-                  className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white/20 dark:bg-black/30 text-sm"
+                  className="w-14 text-center py-1 rounded-lg border dark:border-gray-600 bg-white/10 dark:bg-black/20 text-sm appearance-none"
                   min={5}
                   max={120}
                   step={5}
@@ -193,7 +193,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/15 transition-colors"
             >
               取消
             </button>
