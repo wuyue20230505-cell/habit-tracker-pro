@@ -35,3 +35,11 @@ Checkin: id, habitId, date
 - `src/pages/TodayPage.tsx` - 打卡主页
 - `src/pages/HabitsPage.tsx` - 习惯管理（增删改归）
 - `src/components/HabitForm.tsx` - 习惯表单（频率/次数/番茄钟设置）
+
+## 换电脑部署
+```bash
+git clone <repo-url> && cd habit-tracker-pro && npm install
+cp .env.example .env   # 然后填入 Supabase URL 和 ANON_KEY
+npm run dev
+```
+Supabase: `VITE_SUPABASE_URL=https://glkimrioysdowwygpliq.supabase.co`
