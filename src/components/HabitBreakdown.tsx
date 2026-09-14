@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { Checkin, Habit } from '../types';
-import { calcStreak, calcLongestStreak } from '../utils/streak';
+import { calcStreak, calcLongestStreak, buildSkipPredicate } from '../utils/streak';
 import { today } from '../utils/date';
 
 interface Props {
@@ -17,8 +17,9 @@ export default function HabitBreakdown({ habits, checkins }: Props) {
       .map((h) => {
         const habitCheckins = checkins.filter((c) => c.habitId === h.id);
         const total = habitCheckins.length;
-        const currentStreak = calcStreak(habitCheckins, h.id, d);
-        const longestStreak = calcLongestStreak(habitCheckins, h.id);
+        const skip = buildSkipPredicate(h);
+        const currentStreak = calcStreak(habitCheckins, h.id, d, skip);
+        const longestStreak = calcLongestStreak(habitCheckins, h.id, skip);
         // Completion rate this week
         const weekStart = new Date();
         weekStart.setDate(weekStart.getDate() - weekStart.getDay() + (weekStart.getDay() === 0 ? -6 : 1));

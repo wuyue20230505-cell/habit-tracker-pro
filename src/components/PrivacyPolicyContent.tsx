@@ -72,7 +72,7 @@ export default function PrivacyPolicyContent() {
   return (
     <div className="space-y-5 text-sm leading-relaxed text-stone-700">
       <p>
-        习惯追踪（以下简称"本应用"）非常重视用户隐私。本隐私政策说明本应用如何收集、使用、存储和分享您的个人信息，以及您对这些信息所享有的权利。
+        打卡番茄钟（以下简称"本应用"）非常重视用户隐私。本隐私政策说明本应用如何收集、使用、存储和分享您的个人信息，以及您对这些信息所享有的权利。
       </p>
       {SECTIONS.map((s) => (
         <section key={s.title}>

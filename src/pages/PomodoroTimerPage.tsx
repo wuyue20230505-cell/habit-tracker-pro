@@ -107,6 +107,14 @@ export default function PomodoroTimerPage() {
       </video>
       <div className="absolute inset-0 bg-black/30 z-[1]" />
 
+      {/* 左上角返回按钮：离开专注页但保留番茄钟，回到打卡页后可重新点击进入 */}
+      <button
+        onClick={() => navigate('/checkin')}
+        className="absolute top-4 left-4 z-20 flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur-md text-white text-sm font-medium border border-white/20 hover:bg-white/25 transition-all"
+      >
+        ← 返回
+      </button>
+
       {/* 内容在视频之上 */}
       <div className="relative z-10 flex flex-col items-center w-full">
         {/* Header */}

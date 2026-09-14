@@ -23,3 +23,11 @@ body {
 @media (hover: none) {
   * { background-attachment: scroll !important; }
 }
+
+/* 按钮点击反馈：按压时轻微变暗，配合 utils/feedback.ts 的震动 */
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+button:active, a:active, [role="button"]:active {
+  filter: brightness(0.85);
+}

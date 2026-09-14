@@ -22,7 +22,7 @@ export default function HabitsPage() {
     setFormOpen(true);
   };
 
-  const handleSave = (data: { name: string; emoji: string; color: string; frequency: { type: 'daily' } | { type: 'weekly'; count: number } | { type: 'monthly'; count: number }; usePomodoro: boolean; pomodoroMinutes: number; dailyGoal: number; excludeHolidays: boolean }) => {
+  const handleSave = (data: { name: string; emoji: string; color: string; frequency: { type: 'daily' } | { type: 'weekly'; count: number } | { type: 'monthly'; count: number }; usePomodoro: boolean; pomodoroMinutes: number; dailyGoal: number; excludeHolidays: boolean; excludeWeekends: boolean }) => {
     if (editingHabit) {
       dispatch({ type: 'UPDATE_HABIT', payload: { ...editingHabit, ...data } });
     } else {
@@ -77,7 +77,8 @@ export default function HabitsPage() {
                 <p className="text-xs text-gray-400">
                   {h.frequency.type === 'daily' ? '每天' :
                    h.frequency.type === 'weekly' ? `每周 ${(h.frequency as { type: 'weekly'; count: number }).count} 天` :
-                   `每月 ${(h.frequency as { type: 'monthly'; count: number }).count} 天`}{h.excludeHolidays ? ' · 除节假日' : ''}
+                   `每月 ${(h.frequency as { type: 'monthly'; count: number }).count} 天`}
+                  {h.frequency.type === 'daily' && (h.excludeHolidays || h.excludeWeekends) ? ' · 除节假日周末' : ''}
                 </p>
               </div>
               <button

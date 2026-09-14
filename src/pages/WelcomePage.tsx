@@ -28,7 +28,7 @@ export default function WelcomePage() {
       {/* 可滚动内容 — 独立滚动 */}
       <div className="relative z-10 h-dvh overflow-y-auto flex flex-col items-center">
         <div className="text-center px-5 pt-12 mt-auto">
-          <h1 className="text-xl font-bold text-white tracking-tight drop-shadow-lg">习惯追踪</h1>
+          <h1 className="text-xl font-bold text-white tracking-tight drop-shadow-lg">打卡番茄钟</h1>
           <p className="text-xs text-white/50 mt-1 drop-shadow">习惯打卡 + 番茄钟专注 + 数据统计</p>
         </div>
 

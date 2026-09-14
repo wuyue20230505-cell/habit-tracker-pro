@@ -37,9 +37,9 @@ export default function FeedbackPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: '习惯追踪用户',
+          name: '打卡番茄钟用户',
           message: `${text}\n\n截图数量：${screenshots.length}`,
-          _subject: '习惯追踪App反馈',
+          _subject: '打卡番茄钟App反馈',
         }),
       });
       if (res.ok) {

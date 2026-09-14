@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useStreak } from '../hooks/useStreak';
@@ -17,10 +17,31 @@ export default function HabitCard({ habit, selectedDate }: Props) {
   const checked = isCheckedIn(habit.id, date);
   const count = getCheckinCount(habit.id, date);
   const goal = habit.dailyGoal ?? 1;
+  // 本习惯进行中的番茄钟 → 卡片下显示与专注页一致的进度条
+  const activePomo = state.activePomodoro?.habitId === habit.id ? state.activePomodoro : null;
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    if (!activePomo) return;
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [activePomo?.phaseStartedAt, activePomo?.isBreak]);
+
+  const pomoPhaseDuration = activePomo
+    ? (activePomo.isBreak ? activePomo.breakMinutes : activePomo.workMinutes) * 60
+    : 0;
+  const pomoRemaining = activePomo
+    ? Math.max(0, pomoPhaseDuration - Math.floor((now - activePomo.phaseStartedAt) / 1000))
+    : 0;
+  const pomoPct = pomoPhaseDuration > 0 ? (pomoRemaining / pomoPhaseDuration) * 100 : 0;
+  const fmtTime = (s: number) => {
+    const m = Math.floor(s / 60), sec = s % 60;
+    return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  };
   const { current } = useStreak(
     state.checkins,
     habit.id,
-    checked ? date : new Date(new Date(date).setDate(new Date(date).getDate() - 1)).toISOString().slice(0, 10)
+    checked ? date : new Date(new Date(date).setDate(new Date(date).getDate() - 1)).toISOString().slice(0, 10),
+    habit
   );
 
   // 计算周期进度（每周/每月已完成多少天）
@@ -56,6 +77,12 @@ export default function HabitCard({ habit, selectedDate }: Props) {
   }, [state.checkins, habit.id, habit.frequency, date]);
 
   const handleCheckin = () => {
+    // 该习惯已有进行中的番茄钟 → 重新进入专注页（不新建、不打卡）
+    if (habit.usePomodoro && state.activePomodoro?.habitId === habit.id) {
+      navigate('/pomodoro-timer');
+      return;
+    }
+
     // 每日打卡次数已达上限（番茄钟和普通打卡都受此限制）
     if (count >= goal) return;
 
@@ -121,6 +148,24 @@ export default function HabitCard({ habit, selectedDate }: Props) {
         </div>
 
       </div>
+
+      {/* 进行中的番茄钟进度条：剩余时间与专注页计时一致 */}
+      {activePomo && (
+        <div className="mt-3">
+          <div className="flex items-center justify-between text-xs mb-1">
+            <span className={activePomo.isBreak ? 'text-emerald-500' : 'text-indigo-500'}>
+              {activePomo.isBreak ? '☕ 休息中' : '🍅 专注中'}
+            </span>
+            <span className="text-gray-500 tabular-nums">{fmtTime(pomoRemaining)}</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-white/10 dark:bg-white/5 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-1000 ease-linear ${activePomo.isBreak ? 'bg-emerald-400' : 'bg-indigo-400'}`}
+              style={{ width: `${pomoPct}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {conflict && (
         <div className="mt-3 bg-white/20 dark:bg-black/25 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-sm text-amber-600 dark:text-amber-400 text-center animate-pulse">

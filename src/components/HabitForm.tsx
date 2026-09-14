@@ -22,6 +22,7 @@ interface Props {
     pomodoroMinutes: number;
     dailyGoal: number;
     excludeHolidays: boolean;
+    excludeWeekends: boolean;
   }) => void;
   onClose: () => void;
 }
@@ -34,7 +35,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
   const [usePomodoro, setUsePomodoro] = useState(false);
   const [pomodoroMinutes, setPomodoroMinutes] = useState(25);
   const [dailyGoal, setDailyGoal] = useState(1);
-  const [excludeHolidays, setExcludeHolidays] = useState(false);
+  const [excludeRest, setExcludeRest] = useState(false);
 
   useEffect(() => {
     if (habit) {
@@ -45,7 +46,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
       setUsePomodoro(habit.usePomodoro ?? false);
       setPomodoroMinutes(habit.pomodoroMinutes ?? 25);
       setDailyGoal(habit.dailyGoal ?? 1);
-      setExcludeHolidays(habit.excludeHolidays ?? false);
+      setExcludeRest(!!(habit.excludeHolidays || habit.excludeWeekends));
     } else {
       setName('');
       setEmoji('💪');
@@ -54,7 +55,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
       setUsePomodoro(false);
       setPomodoroMinutes(25);
       setDailyGoal(1);
-      setExcludeHolidays(false);
+      setExcludeRest(false);
     }
   }, [habit, open]);
 
@@ -63,7 +64,7 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onSave({ name: name.trim(), emoji, color, frequency, usePomodoro, pomodoroMinutes, dailyGoal, excludeHolidays });
+    onSave({ name: name.trim(), emoji, color, frequency, usePomodoro, pomodoroMinutes, dailyGoal, excludeHolidays: excludeRest, excludeWeekends: excludeRest });
     onClose();
   };
 
@@ -104,7 +105,12 @@ export default function HabitForm({ open, habit, onSave, onClose }: Props) {
             </div>
           </div>
 
-          <FrequencyPicker value={frequency} onChange={setFrequency} excludeHolidays={excludeHolidays} onExcludeHolidaysChange={setExcludeHolidays} />
+          <FrequencyPicker
+            value={frequency}
+            onChange={setFrequency}
+            excludeRest={excludeRest}
+            onExcludeRestChange={setExcludeRest}
+          />
 
           {/* Daily goal */}
           <div>

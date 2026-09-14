@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.habitracker.app',
-  appName: '习惯追踪PRO',
+  appName: '打卡番茄钟',
   webDir: 'dist'
 };
 

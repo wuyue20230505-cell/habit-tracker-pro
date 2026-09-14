@@ -4,7 +4,7 @@ interface Props {
 }
 
 const SHARE_LINK = 'https://www.pgyer.com/xgzzpro';
-const SHARE_TEXT = `🎯 习惯追踪PRO — 自律打卡神器！
+const SHARE_TEXT = `🎯 打卡番茄钟 — 自律打卡神器！
 
 ✅ 每日打卡 + 番茄钟专注
 🍅 环境白噪音 + 钢琴曲

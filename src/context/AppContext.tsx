@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, useRef, type ReactNode } from 'react';
-import type { AppState, AppAction, Habit, Checkin, ActivePomodoro } from '../types';
+import type { AppState, AppAction, Habit, Checkin, ActivePomodoro, Goal, Countdown } from '../types';
 import { generateId, today } from '../utils/date';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { syncToLeaderboard } from '../utils/leaderboardSync';
@@ -11,6 +11,9 @@ const initialState: AppState = {
   checkins: [],
   activePomodoro: null,
   pomodoroRecords: [],
+  goals: [],
+  countdowns: [],
+  deletedHabitIds: [],
 };
 
 function reducer(state: AppState, action: AppAction): AppState {
@@ -32,6 +35,10 @@ function reducer(state: AppState, action: AppAction): AppState {
         habits: state.habits.filter((h) => h.id !== action.payload),
         checkins: state.checkins.filter((c) => c.habitId !== action.payload),
         activePomodoro: state.activePomodoro?.habitId === action.payload ? null : state.activePomodoro,
+        // 墓碑：记录已删除 id，随 push 同步云端，防止其他设备把它推回来
+        deletedHabitIds: state.deletedHabitIds.includes(action.payload)
+          ? state.deletedHabitIds
+          : [...state.deletedHabitIds, action.payload],
       };
 
     case 'ARCHIVE_HABIT':
@@ -93,12 +100,67 @@ function reducer(state: AppState, action: AppAction): AppState {
     case 'ADD_POMODORO_RECORD':
       return { ...state, pomodoroRecords: [...(state.pomodoroRecords || []), action.payload] };
 
+    case 'ADD_GOAL':
+      return { ...state, goals: [...state.goals, action.payload] };
+
+    case 'UPDATE_GOAL':
+      return {
+        ...state,
+        goals: state.goals.map((g) =>
+          g.id === action.payload.id ? action.payload : g
+        ),
+      };
+
+    case 'INCREMENT_GOAL': {
+      const { id, delta } = action.payload;
+      return {
+        ...state,
+        goals: state.goals.map((g) => {
+          if (g.id !== id || g.status !== 'active') return g;
+          const nextVal = Math.min(g.targetValue, g.currentValue + delta);
+          const completed = nextVal >= g.targetValue;
+          return {
+            ...g,
+            currentValue: nextVal,
+            status: completed ? 'completed' as const : g.status,
+            completedAt: completed ? new Date().toISOString() : g.completedAt,
+          };
+        }),
+      };
+    }
+
+    case 'DELETE_GOAL':
+      return {
+        ...state,
+        goals: state.goals.filter((g) => g.id !== action.payload),
+      };
+
+    case 'ADD_COUNTDOWN':
+      return { ...state, countdowns: [...state.countdowns, action.payload] };
+
+    case 'UPDATE_COUNTDOWN':
+      return {
+        ...state,
+        countdowns: state.countdowns.map((c) =>
+          c.id === action.payload.id ? action.payload : c
+        ),
+      };
+
+    case 'DELETE_COUNTDOWN':
+      return {
+        ...state,
+        countdowns: state.countdowns.filter((c) => c.id !== action.payload),
+      };
+
     case 'CLOUD_SYNC':
       return {
         ...state,
         habits: action.payload.habits,
         checkins: action.payload.checkins,
         pomodoroRecords: action.payload.records,
+        goals: action.payload.goals || [],
+        countdowns: action.payload.countdowns || [],
+        deletedHabitIds: action.payload.deletedHabitIds || [],
       };
 
     default:
@@ -119,6 +181,14 @@ interface AppContextType {
   startBreak: () => void;
   incrementCycle: () => void;
   addPomodoroRecord: (minutes: number, habitId?: string) => void;
+  addGoal: (data: Omit<Goal, 'id' | 'status' | 'currentValue' | 'createdAt'>) => void;
+  updateGoal: (id: string, patch: Partial<Goal>) => void;
+  incrementGoal: (id: string, delta: number) => boolean;
+  deleteGoal: (id: string) => void;
+  startGoalPomodoro: (goal: Goal) => void;
+  addCountdown: (data: Omit<Countdown, 'id' | 'createdAt'>) => void;
+  updateCountdown: (id: string, patch: Partial<Countdown>) => void;
+  deleteCountdown: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -126,7 +196,7 @@ const AppContext = createContext<AppContextType | null>(null);
 export function AppProvider({ children, uid }: { children: ReactNode; uid?: string }) {
   const storageKey = `habit-${uid || 'local'}`;
   const [rawState, setState] = useLocalStorage<AppState>(storageKey, initialState);
-  const state: AppState = { ...initialState, ...rawState, pomodoroRecords: rawState.pomodoroRecords || [] };
+  const state: AppState = { ...initialState, ...rawState, pomodoroRecords: rawState.pomodoroRecords || [], goals: rawState.goals || [], countdowns: rawState.countdowns || [], deletedHabitIds: rawState.deletedHabitIds || [] };
   const [stateSnapshot, dispatch] = useReducer(reducer, state);
   const cloudSynced = useRef(false);
   const cloudReady = useRef(false); // pullAll 完成后才允许 push
@@ -146,9 +216,9 @@ export function AppProvider({ children, uid }: { children: ReactNode; uid?: stri
       // 先推送本地状态到云端，确保本地删除同步上去
       // 使用 latestState.current 而非闭包中的 state（后者在 effect 里是过时的）
       const local = latestState.current;
-      pushAll(local.habits, local.checkins, local.pomodoroRecords || [])
+      pushAll(local.habits, local.checkins, local.pomodoroRecords || [], local.deletedHabitIds || [])
         .catch(() => {}) // 网络失败不阻塞后续流程
-        .finally(() => pullAll())
+        .then(() => pullAll())
         .then((cloud) => {
           cloudReady.current = true;
 
@@ -159,14 +229,21 @@ export function AppProvider({ children, uid }: { children: ReactNode; uid?: stri
             [...b, ...a].forEach(x => map.set(x.id, x));
             return [...map.values()];
           };
-          const habits = mergeArr(cloud.habits, local.habits);
-          const checkins = mergeArr(cloud.checkins, local.checkins);
+          // 墓碑并集：本地已删 + 云端已删，合并结果一律剔除
+          const deletedHabitIds = Array.from(new Set([
+            ...(local.deletedHabitIds || []),
+            ...(cloud.deletedHabitIds || []),
+          ]));
+          const habits = mergeArr(cloud.habits, local.habits).filter((h) => !deletedHabitIds.includes(h.id));
+          const checkins = mergeArr(cloud.checkins, local.checkins).filter((c) => !deletedHabitIds.includes(c.habitId));
           const records = mergeArr(cloud.records, local.pomodoroRecords || []);
+          const goals = mergeArr((cloud as any).goals || [], local.goals || []);
+          const countdowns = mergeArr((cloud as any).countdowns || [], local.countdowns || []);
 
-          const newState: AppState = { habits, checkins, activePomodoro: null, pomodoroRecords: records };
+          const newState: AppState = { habits, checkins, activePomodoro: null, pomodoroRecords: records, goals, countdowns, deletedHabitIds };
           setState(newState);
           latestState.current = newState;
-          dispatch({ type: 'CLOUD_SYNC', payload: { habits, checkins, records } });
+          dispatch({ type: 'CLOUD_SYNC', payload: { habits, checkins, records, goals, countdowns, deletedHabitIds } });
         });
     });
   }, []);
@@ -182,7 +259,7 @@ export function AppProvider({ children, uid }: { children: ReactNode; uid?: stri
       clearTimeout((persistDispatch as any)._t);
       (persistDispatch as any)._t = setTimeout(() => {
         if (cloudReady.current) {
-          pushAll(newState.habits, newState.checkins, newState.pomodoroRecords || []);
+          pushAll(newState.habits, newState.checkins, newState.pomodoroRecords || [], newState.deletedHabitIds || []);
         }
       }, 2000);
     }
@@ -316,6 +393,73 @@ export function AppProvider({ children, uid }: { children: ReactNode; uid?: stri
     );
   };
 
+  // ── 目标操作 ────────────────────────────
+  const addGoal = (data: Omit<Goal, 'id' | 'status' | 'currentValue' | 'createdAt'>) => {
+    const goal: Goal = {
+      ...data,
+      id: generateId(),
+      status: 'active',
+      currentValue: 0,
+      createdAt: new Date().toISOString(),
+    };
+    persistDispatch({ type: 'ADD_GOAL', payload: goal });
+  };
+
+  const updateGoal = (id: string, patch: Partial<Goal>) => {
+    const cur = latestState.current.goals.find((g) => g.id === id);
+    if (!cur) return;
+    persistDispatch({ type: 'UPDATE_GOAL', payload: { ...cur, ...patch } });
+  };
+
+  const incrementGoal = (id: string, delta: number): boolean => {
+    const goal = latestState.current.goals.find((g) => g.id === id);
+    if (!goal || goal.status !== 'active') return false;
+    const nextVal = Math.min(goal.targetValue, goal.currentValue + delta);
+    persistDispatch({ type: 'INCREMENT_GOAL', payload: { id, delta } });
+    return nextVal >= goal.targetValue;
+  };
+
+  const deleteGoal = (id: string) => {
+    persistDispatch({ type: 'DELETE_GOAL', payload: id });
+  };
+
+  const startGoalPomodoro = (goal: Goal) => {
+    if (latestState.current.activePomodoro) return;
+    const payload: ActivePomodoro = {
+      habitId: goal.id,
+      goalId: goal.id,
+      habitName: goal.name,
+      habitEmoji: goal.emoji,
+      workMinutes: 25,
+      breakMinutes: 5,
+      startedAt: Date.now(),
+      totalCycles: 0,
+      isBreak: false,
+      phaseStartedAt: Date.now(),
+    };
+    persistDispatch({ type: 'START_POMODORO', payload });
+  };
+
+  // ── 倒数日操作 ──────────────────────────
+  const addCountdown = (data: Omit<Countdown, 'id' | 'createdAt'>) => {
+    const cd: Countdown = {
+      ...data,
+      id: generateId(),
+      createdAt: new Date().toISOString(),
+    };
+    persistDispatch({ type: 'ADD_COUNTDOWN', payload: cd });
+  };
+
+  const updateCountdown = (id: string, patch: Partial<Countdown>) => {
+    const cur = latestState.current.countdowns.find((c) => c.id === id);
+    if (!cur) return;
+    persistDispatch({ type: 'UPDATE_COUNTDOWN', payload: { ...cur, ...patch } });
+  };
+
+  const deleteCountdown = (id: string) => {
+    persistDispatch({ type: 'DELETE_COUNTDOWN', payload: id });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -331,6 +475,14 @@ export function AppProvider({ children, uid }: { children: ReactNode; uid?: stri
         startBreak,
         incrementCycle,
         addPomodoroRecord,
+        addGoal,
+        updateGoal,
+        incrementGoal,
+        deleteGoal,
+        startGoalPomodoro,
+        addCountdown,
+        updateCountdown,
+        deleteCountdown,
       }}
     >
       {children}

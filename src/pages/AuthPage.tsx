@@ -82,7 +82,7 @@ export default function AuthPage() {
       <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 w-full max-w-sm shadow-sm relative z-10">
         <div className="text-center mb-6">
           <span className="text-4xl">🍅</span>
-          <h1 className="text-xl font-bold text-white mt-2 drop-shadow-lg">习惯追踪</h1>
+          <h1 className="text-xl font-bold text-white mt-2 drop-shadow-lg">打卡番茄钟</h1>
         </div>
 
         {/* Tabs */}

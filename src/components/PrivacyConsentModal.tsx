@@ -30,7 +30,7 @@ export default function PrivacyConsentModal({ onAgree, onDisagree }: Props) {
         {!showFull ? (
           <>
             <div className="text-center text-xs text-stone-600 mb-4">
-              欢迎使用习惯追踪！在使用本应用前，请仔细阅读并同意我们的隐私政策。
+              欢迎使用打卡番茄钟！在使用本应用前，请仔细阅读并同意我们的隐私政策。
             </div>
             <ul className="space-y-2.5 mb-5">
               {KEY_POINTS.map(([icon, text]) => (

@@ -3,11 +3,11 @@ import type { Frequency } from '../types';
 interface Props {
   value: Frequency;
   onChange: (freq: Frequency) => void;
-  excludeHolidays?: boolean;
-  onExcludeHolidaysChange?: (v: boolean) => void;
+  excludeRest?: boolean;
+  onExcludeRestChange?: (v: boolean) => void;
 }
 
-export default function FrequencyPicker({ value, onChange, excludeHolidays, onExcludeHolidaysChange }: Props) {
+export default function FrequencyPicker({ value, onChange, excludeRest, onExcludeRestChange }: Props) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">频率</label>
@@ -48,12 +48,14 @@ export default function FrequencyPicker({ value, onChange, excludeHolidays, onEx
         </div>
       )}
 
-      {onExcludeHolidaysChange && (
-        <label className="flex items-center gap-2 mt-3 cursor-pointer">
-          <input type="checkbox" checked={excludeHolidays ?? false}
-            onChange={e => onExcludeHolidaysChange(e.target.checked)}
+      {/* 跳过开关：仅每天频率显示（每周/每月不需要） */}
+      {value.type === 'daily' && onExcludeRestChange && (
+        <label className="flex items-center gap-2 cursor-pointer mt-3">
+          <input type="checkbox" checked={excludeRest ?? false}
+            onChange={e => onExcludeRestChange(e.target.checked)}
             className="w-4 h-4 accent-indigo-500" />
-          <span className="text-sm text-gray-500">法定节假日不打卡</span>
+          <span className="text-sm text-gray-500">跳过法定节假日和周末</span>
+          <span className="text-xs text-gray-400">跳过日不中断连续</span>
         </label>
       )}
     </div>

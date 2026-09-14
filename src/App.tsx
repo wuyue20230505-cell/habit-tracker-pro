@@ -17,6 +17,12 @@ import PomodoroTimerPage from './pages/PomodoroTimerPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import FeedbackPage from './pages/FeedbackPage';
 import PrivacyPage from './pages/PrivacyPage';
+import GoalsPage from './pages/GoalsPage';
+import GoalDetailPage from './pages/GoalDetailPage';
+import CountdownsPage from './pages/CountdownsPage';
+import CountdownDetailPage from './pages/CountdownDetailPage';
+import CountdownFormPage from './pages/CountdownFormPage';
+import ToastHost from './components/Toast';
 
 function GlobalPaywall() {
   const { showPaywall, setShowPaywall, paywallReason } = useProCtx();
@@ -50,6 +56,12 @@ function AppContent() {
             <Route path="/auth" element={<AuthPage />} />
             <Route element={<Layout />}>
               <Route path="checkin" element={<TodayPage />} />
+              <Route path="goals" element={<GoalsPage />} />
+              <Route path="goals/:id" element={<GoalDetailPage />} />
+              <Route path="countdowns" element={<CountdownsPage />} />
+              <Route path="countdowns/new" element={<CountdownFormPage />} />
+              <Route path="countdowns/:id/edit" element={<CountdownFormPage />} />
+              <Route path="countdowns/:id" element={<CountdownDetailPage />} />
               <Route path="pomodoro" element={<PomodoroPage />} />
               <Route path="habits" element={<HabitsPage />} />
               <Route path="history" element={<HistoryPage />} />
@@ -62,6 +74,7 @@ function AppContent() {
           </Routes>
         </BrowserRouter>
         <GlobalPaywall />
+        <ToastHost />
       </ProProvider>
     </AppProvider>
   );

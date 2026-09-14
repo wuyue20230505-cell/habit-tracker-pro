@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { today, formatDate } from '../utils/date';
+import { isStatutoryHoliday, isWeekendRest } from '../utils/holidays';
 import HabitCard from '../components/HabitCard';
 import DateSlider from '../components/DateSlider';
 import MusicPicker from '../components/MusicPicker';
@@ -15,21 +16,10 @@ export default function TodayPage() {
 
   const isToday = selectedDate === today();
 
-  // Simple Chinese holiday check (major holidays)
-  const isHoliday = (dateStr: string) => {
-    const holidays = new Set([
-      '2026-01-01','2026-01-28','2026-01-29','2026-01-30','2026-01-31','2026-02-01','2026-02-02', // 元旦+春节
-      '2026-04-04','2026-04-05','2026-04-06', // 清明
-      '2026-05-01','2026-05-02','2026-05-03','2026-05-04','2026-05-05', // 劳动
-      '2026-05-31','2026-06-01', // 端午
-      '2026-09-25','2026-09-26','2026-09-27', // 中秋+国庆
-      '2026-10-01','2026-10-02','2026-10-03','2026-10-04','2026-10-05','2026-10-06','2026-10-07',
-    ]);
-    return holidays.has(dateStr);
-  };
-
+  // 跳过日：法定节假日 / 周末休息（调休上班的周末不算休息）→ 隐藏该习惯卡片
   const todaysHabits = activeHabits.filter((h) => {
-    if (h.excludeHolidays && isHoliday(selectedDate)) return false;
+    if (h.excludeHolidays && isStatutoryHoliday(selectedDate)) return false;
+    if (h.excludeWeekends && isWeekendRest(selectedDate)) return false;
     return true; // All habits visible every day, completion tracked by period
   });
 

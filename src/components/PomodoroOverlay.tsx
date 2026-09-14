@@ -1,51 +1,39 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
   startSoundscape,
-  stopSoundscape,
   getPlayingState,
   playWorkCompleteSound,
   playBreakEndSound,
-  type SoundscapeType,
 } from '../utils/audio';
 
+// 后台番茄钟计时器：用户从专注页返回打卡页后，番茄钟继续计时。
+// 2026-08-13 起不再显示悬浮框 UI（用户要求去掉），进度改为显示在对应习惯卡片下（见 HabitCard）。
+// 专注结束 → 自动打卡 + 记录 + 切休息（与专注页行为一致）。
 export default function PomodoroOverlay() {
-  const { state, addCheckin, stopPomodoro, startBreak, incrementCycle } = useApp();
-  const navigate = useNavigate();
+  const { state, addCheckin, addPomodoroRecord, startBreak } = useApp();
   const location = useLocation();
   const { activePomodoro } = state;
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [isRunning, setIsRunning] = useState(true);
-  const [musicType, setMusicType] = useState<SoundscapeType>('fire');
   const intervalRef = useRef<number | null>(null);
   const hasAlerted = useRef(false);
 
   const isOnTimerPage = location.pathname === '/pomodoro-timer';
 
-  // Don't show overlay on timer page (full screen version is there)
-  if (!activePomodoro || isOnTimerPage) return null;
-
-  // Timer logic (same as timer page)
+  // 背景计时（专注页有自己的计时器，两者互斥）
   useEffect(() => {
-    if (!activePomodoro) return;
+    if (!activePomodoro || isOnTimerPage) return;
 
     const phaseDuration = activePomodoro.isBreak
       ? activePomodoro.breakMinutes * 60
       : activePomodoro.workMinutes * 60;
     const elapsed = Math.floor((Date.now() - activePomodoro.phaseStartedAt) / 1000);
-    const remaining = Math.max(0, phaseDuration - elapsed);
-    setTimeLeft(remaining);
-    setIsRunning(true);
+    let left = Math.max(0, phaseDuration - elapsed);
     hasAlerted.current = false;
 
-    const leftRef = { current: remaining };
     intervalRef.current = window.setInterval(() => {
-      const next = leftRef.current - 1;
-      leftRef.current = next;
-      setTimeLeft(Math.max(0, next));
-      if (next <= 0) {
-        setIsRunning(false);
+      left -= 1;
+      if (left <= 0) {
         if (intervalRef.current) clearInterval(intervalRef.current);
         // 副作用在 updater 外（updater 会被 React 重复调用，必须保持纯函数）
         if (!hasAlerted.current) {
@@ -53,6 +41,9 @@ export default function PomodoroOverlay() {
           if (activePomodoro.isBreak) {
             playBreakEndSound();
           } else {
+            // 与专注页一致：专注结束 → 自动打卡 + 记录 + 切休息
+            addCheckin(activePomodoro.habitId);
+            addPomodoroRecord(activePomodoro.workMinutes);
             playWorkCompleteSound();
             startBreak();
           }
@@ -63,101 +54,14 @@ export default function PomodoroOverlay() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [activePomodoro?.phaseStartedAt, activePomodoro?.isBreak]);
+  }, [activePomodoro?.phaseStartedAt, activePomodoro?.isBreak, isOnTimerPage]);
 
-  // Start music if not playing
+  // 返回打卡页且番茄钟仍在进行时，若没在放音乐则自动播放专注白噪音
   useEffect(() => {
-    if (!getPlayingState()) {
+    if (activePomodoro && !isOnTimerPage && !getPlayingState()) {
       startSoundscape('fire');
-      setMusicType('fire');
     }
-  }, []);
+  }, [activePomodoro, isOnTimerPage]);
 
-  const handleContinue = () => {
-    incrementCycle();
-  };
-
-  const handleFinish = () => {
-    addCheckin(activePomodoro!.habitId);
-    stopPomodoro();
-    stopSoundscape();
-  };
-
-  const handleCancel = () => {
-    stopPomodoro();
-    stopSoundscape();
-    navigate('/checkin');
-  };
-
-  const handleMusicChange = (type: SoundscapeType) => {
-    setMusicType(type);
-    if (type === 'none') stopSoundscape();
-    else startSoundscape(type);
-  };
-
-  const fmt = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-  };
-
-  return (
-    <div className="fixed bottom-20 inset-x-0 z-40 flex justify-center pointer-events-none">
-      <div className="pointer-events-auto bg-white/15 dark:bg-black/20 rounded-2xl shadow-2xl border dark:border-gray-700 mx-4 p-4 w-full max-w-sm">
-        {/* Click to go to timer page */}
-        <button
-          onClick={() => navigate('/pomodoro-timer')}
-          className="w-full text-left"
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-xl">{activePomodoro.habitEmoji}</span>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
-                {activePomodoro.isBreak ? '☕ 休息中' : `🍅 ${activePomodoro.habitName}`}
-              </div>
-              <div className="text-xs text-gray-400">
-                第 {activePomodoro.totalCycles + 1} 轮 · {fmt(timeLeft)}
-              </div>
-            </div>
-          </div>
-        </button>
-
-        {/* Break: action buttons */}
-        {!isRunning && activePomodoro.isBreak && (
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={handleContinue}
-              className="flex-1 py-1.5 rounded-lg bg-indigo-500 text-white text-xs font-medium"
-            >
-              继续
-            </button>
-            <button
-              onClick={handleFinish}
-              className="flex-1 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-medium"
-            >
-              完成打卡
-            </button>
-          </div>
-        )}
-
-        {/* Music + cancel */}
-        <div className="flex items-center justify-between mt-2 pt-2 border-t dark:border-gray-700">
-          <div className="flex gap-1">
-            {(['fire', 'rain2', 'ocean', 'canon', 'mariage', 'fate', 'fivehundred', 'none'] as SoundscapeType[]).map((type) => (
-              <button
-                key={type}
-                onClick={() => handleMusicChange(type)}
-                className={`text-xs px-1 py-0.5 rounded ${musicType === type ? 'bg-indigo-100 dark:bg-indigo-900/30' : ''}`}
-              >
-                {type === 'fire' ? '🌧' : type === 'ocean' ? '🌊' : type === 'canon' ? '🎻' : type === 'mariage' ? '💒' : type === 'fivehundred' ? '🚂' : type === 'fate' ? '🎺' : type === 'rain2' ? '💧' : '🔇'}
-              </button>
-            ))}
-          </div>
-          <button onClick={handleCancel} className="text-xs text-red-400 hover:text-red-600 font-medium">
-            结束
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 }

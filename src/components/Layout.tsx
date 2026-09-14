@@ -8,9 +8,11 @@ import ShareModal from './ShareModal';
 
 const TABS = [
   { to: '/checkin', label: '打卡', icon: '✅' },
+  { to: '/habits', label: '习惯', icon: '📋' },
+  { to: '/goals', label: '目标', icon: '🎯' },
+  { to: '/countdowns', label: '倒数日', icon: '📅' },
   { to: '/pomodoro', label: '番茄', icon: '🍅' },
   { to: '/leaderboard', label: '排行', icon: '🏆' },
-  { to: '/habits', label: '习惯', icon: '📋' },
   { to: '/stats', label: '统计', icon: '📊' },
 ];
 
@@ -85,16 +87,16 @@ export default function Layout() {
             <NavLink
               key={tab.to}
               to={tab.to}
-              end={tab.to === '/checkin'}
+              end={tab.to === '/checkin' || tab.to === '/goals' || tab.to === '/countdowns'}
               className={({ isActive }) =>
-                `flex flex-col items-center py-1.5 px-2 text-[10px] gap-0.5 transition-colors drop-shadow-sm ${
+                `flex flex-col items-center py-1.5 px-1 text-[9px] gap-0.5 transition-colors drop-shadow-sm ${
                   isActive
                     ? 'text-white scale-110'
                     : 'text-white/60'
                 }`
               }
             >
-              <span className="text-lg">{tab.icon}</span>
+              <span className="text-base">{tab.icon}</span>
               <span>{tab.label}</span>
             </NavLink>
           ))}

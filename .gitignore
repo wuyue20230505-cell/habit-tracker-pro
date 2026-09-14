@@ -25,3 +25,7 @@ dist-ssr
 
 .vercel
 .env*
+!.env.example
+
+# Android 本机 SDK 路径配置（含本机绝对路径，勿提交）
+local.properties*

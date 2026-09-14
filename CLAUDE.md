@@ -24,8 +24,10 @@ Checkin: id, habitId, date
 - `handleCheckin`: 每日上限 `count>=goal` 前置拦截（番茄钟也受此限制）
 - `persistDispatch`: 同步推进 `latestState` ref + useReducer + localStorage + debounce(2s)→push
 - `CLOUD_SYNC` 后必须 `latestState.current = newState`，否则后续操作基于过时状态
-- push 合并时本地数据在前（`[...local, ...cloud]`），本地删除/编辑优先
-- 登录时先 push 本地再 pull 云端，防删除的习惯复活
+- 删除同步用墓碑：删除后 id 存 `deletedHabitIds`，云端写 `{deleted:true}` 行，push/pull 双向过滤，防已删习惯复活
+- push 合并时本地数据在前（`[...local, ...cloud]`），本地删除/编辑优先；登录时先 push 后 pull
+- 农历转换用 lunar-javascript 库（旧手写数据表有闰月错误，已废弃）；`src/types/lunar-javascript.d.ts` 是手写类型声明
+- 节假日/跳过休息日用 `src/utils/holidays.ts`（2026 按国办发明电〔2025〕7号），勿在页面硬编码日期；连续计算日期用 `'T00:00:00Z'`+UTC 解析（本地解析 UTC+8 差一天）
 
 ## 文件索引
 - `src/context/AppContext.tsx` - 核心状态+打卡逻辑+同步

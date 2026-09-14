@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: '习惯追踪',
+        name: '打卡番茄钟',
         short_name: '打卡',
-        description: '习惯追踪打卡应用',
+        description: '打卡番茄钟应用',
         theme_color: '#6366f1',
         background_color: '#ffffff',
         display: 'standalone',
