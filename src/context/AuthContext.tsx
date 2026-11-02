@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { supabase, type User } from '../lib/supabase';
+import { friendlyCloudError } from '../utils/friendlyError';
 
 interface AuthState {
   user: User | null;
@@ -17,6 +18,19 @@ interface AuthState {
 const AuthContext = createContext<AuthState | null>(null);
 
 const notConfigured = { error: '请先配置 Supabase（设置 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY）' };
+
+// 统一包一层：网络错误（如 "Failed to fetch"）翻译成中文提示；
+// 同时接住极少见的 throw，避免页面拿到未处理的 Promise。
+async function runAuth(
+  request: Promise<{ error: { message: string } | null }>,
+): Promise<{ error?: string }> {
+  try {
+    const { error } = await request;
+    return error ? { error: friendlyCloudError(error.message) } : {};
+  } catch (e) {
+    return { error: friendlyCloudError(e instanceof Error ? e.message : String(e)) };
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -39,16 +53,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     loading,
     signUpWithEmail: s ? (email, password, username, avatar) =>
-      s.auth.signUp({ email, password, options: { data: { username: username || email.split('@')[0], avatar: avatar || '🏃' } } }).then(({ error }) => error ? { error: error.message } : {})
+      runAuth(s.auth.signUp({ email, password, options: { data: { username: username || email.split('@')[0], avatar: avatar || '🏃' } } }))
     : async () => notConfigured,
     signInWithEmail: s ? (email, password) =>
-      s.auth.signInWithPassword({ email, password }).then(({ error }) => error ? { error: error.message } : {})
+      runAuth(s.auth.signInWithPassword({ email, password }))
     : async () => notConfigured,
     signInWithPhone: s ? (phone) =>
-      s.auth.signInWithOtp({ phone }).then(({ error }) => error ? { error: error.message } : {})
+      runAuth(s.auth.signInWithOtp({ phone }))
     : async () => notConfigured,
     verifyOtp: s ? (phone, token) =>
-      s.auth.verifyOtp({ phone, token, type: 'sms' }).then(({ error }) => error ? { error: error.message } : {})
+      runAuth(s.auth.verifyOtp({ phone, token, type: 'sms' }))
     : async () => notConfigured,
     getUsername: () => user?.user_metadata?.username || user?.email?.split('@')[0] || '用户',
     getAvatar: () => user?.user_metadata?.avatar || '🏃',

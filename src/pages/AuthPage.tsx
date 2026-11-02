@@ -133,6 +133,12 @@ export default function AuthPage() {
             </button>
           </form>
 
+        {/* 云端连不上时的出口：打卡本身是本地优先，不登录也能正常用 */}
+        <button type="button" onClick={() => navigate('/checkin')}
+          className="mt-3 w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white/60 text-xs border border-white/10">
+          网络不好？先离线使用，本地打卡 →
+        </button>
+
         {/* 隐私政策提示（华为审核 7.5：注册/登录界面须展示） */}
         <div className="mt-4 text-center text-xs text-white/50 space-y-2">
           {tab === 'register' ? (
@@ -149,7 +155,7 @@ export default function AuthPage() {
           )}
         </div>
 
-        <p className="text-xs text-gray-400 text-center mt-3">数据云端同步 · 多设备共享</p>
+        <p className="text-xs text-gray-400 text-center mt-3">云端同步可选 · 不登录也能本地打卡</p>
       </div>
       <button onClick={() => navigate('/')} className="mt-4 text-white/50 hover:text-white text-sm drop-shadow relative z-10">← 返回首页</button>
     </div>

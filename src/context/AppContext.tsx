@@ -244,8 +244,10 @@ export function AppProvider({ children, uid }: { children: ReactNode; uid?: stri
           setState(newState);
           latestState.current = newState;
           dispatch({ type: 'CLOUD_SYNC', payload: { habits, checkins, records, goals, countdowns, deletedHabitIds } });
-        });
-    });
+        })
+        // 云端拉取失败时保持 cloudReady=false：本地照常读写，等下次登录再同步
+        .catch(() => { cloudReady.current = false; });
+    }).catch(() => {});
   }, []);
 
   const persistDispatch = (action: AppAction) => {
@@ -259,7 +261,8 @@ export function AppProvider({ children, uid }: { children: ReactNode; uid?: stri
       clearTimeout((persistDispatch as any)._t);
       (persistDispatch as any)._t = setTimeout(() => {
         if (cloudReady.current) {
-          pushAll(newState.habits, newState.checkins, newState.pomodoroRecords || [], newState.deletedHabitIds || []);
+          // 后台同步失败不打扰用户；本地数据已由 useLocalStorage 落盘
+          pushAll(newState.habits, newState.checkins, newState.pomodoroRecords || [], newState.deletedHabitIds || []).catch(() => {});
         }
       }, 2000);
     }
@@ -277,7 +280,8 @@ export function AppProvider({ children, uid }: { children: ReactNode; uid?: stri
 
   // ── 同步排行榜 ────────────────────────────
   const syncLB = (habits: Habit[], checkins: Checkin[]) => {
-    syncToLeaderboard(habits, checkins, latestState.current.pomodoroRecords || []);
+    // 排行榜是锦上添花：网络失败静默跳过，不影响打卡
+    syncToLeaderboard(habits, checkins, latestState.current.pomodoroRecords || []).catch(() => {});
   };
 
   const addCheckin = (habitId: string, date?: string) => {
@@ -390,7 +394,7 @@ export function AppProvider({ children, uid }: { children: ReactNode; uid?: stri
       latestState.current.habits,
       latestState.current.checkins,
       latestState.current.pomodoroRecords || [],
-    );
+    ).catch(() => {});
   };
 
   // ── 目标操作 ────────────────────────────
